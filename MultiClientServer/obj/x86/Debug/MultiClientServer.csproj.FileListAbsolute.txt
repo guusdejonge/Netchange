@@ -6,3 +6,5 @@ F:\Users\Tom\Dropbox\b3cc\MultiClientServer\MultiClientServer\obj\x86\Debug\Mult
 F:\Users\Tom\Dropbox\b3cc\MultiClientServer\MultiClientServer\obj\x86\Debug\MultiClientServer.pdb
 F:\Users\Tom\Dropbox\b3cc\MultiClientServer\MultiClientServer\bin\Debug\MultiClientServer.exe
 F:\Users\Tom\Dropbox\b3cc\MultiClientServer\MultiClientServer\bin\Debug\MultiClientServer.pdb
+C:\Users\Guus de Jonge\Documents\GitHub\Netchange\MultiClientServer\obj\x86\Debug\MultiClientServer.exe
+C:\Users\Guus de Jonge\Documents\GitHub\Netchange\MultiClientServer\obj\x86\Debug\MultiClientServer.pdb

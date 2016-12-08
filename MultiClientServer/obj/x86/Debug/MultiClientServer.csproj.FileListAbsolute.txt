@@ -8,3 +8,5 @@ F:\Users\Tom\Dropbox\b3cc\MultiClientServer\MultiClientServer\bin\Debug\MultiCli
 F:\Users\Tom\Dropbox\b3cc\MultiClientServer\MultiClientServer\bin\Debug\MultiClientServer.pdb
 C:\Users\Guus de Jonge\Documents\GitHub\Netchange\MultiClientServer\obj\x86\Debug\MultiClientServer.exe
 C:\Users\Guus de Jonge\Documents\GitHub\Netchange\MultiClientServer\obj\x86\Debug\MultiClientServer.pdb
+C:\Users\Tim Smit\Documents\New folder\MultiClientServer\obj\x86\Debug\MultiClientServer.exe
+C:\Users\Tim Smit\Documents\New folder\MultiClientServer\obj\x86\Debug\MultiClientServer.pdb

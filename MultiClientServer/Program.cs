@@ -8,7 +8,7 @@ namespace MultiClientServer
     class Program
     {
         static public int MijnPoort;
-
+        //test
         static public Dictionary<int, Connection> Buren = new Dictionary<int, Connection>();
 
         static void Main(string[] args)

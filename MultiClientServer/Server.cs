@@ -11,6 +11,7 @@ namespace MultiClientServer
 {
     class Server
     {
+        object locker = new object();
         public Server(int port)
         {
             // Luister op de opgegeven poort naar verbindingen
@@ -25,18 +26,25 @@ namespace MultiClientServer
         {
             while (true)
             {
-                TcpClient client = handle.AcceptTcpClient();
-                StreamReader clientIn = new StreamReader(client.GetStream());
-                StreamWriter clientOut = new StreamWriter(client.GetStream());
-                clientOut.AutoFlush = true;
+                try
+                {
+                    TcpClient client = handle.AcceptTcpClient();
+                    StreamReader clientIn = new StreamReader(client.GetStream());
+                    StreamWriter clientOut = new StreamWriter(client.GetStream());
+                    clientOut.AutoFlush = true;
 
-                // De server weet niet wat de poort is van de client die verbinding maakt, de client geeft dus als onderdeel van het protocol als eerst een bericht met zijn poort
-                int zijnPoort = int.Parse(clientIn.ReadLine().Split()[1]);
+                    // De server weet niet wat de poort is van de client die verbinding maakt, de client geeft dus als onderdeel van het protocol als eerst een bericht met zijn poort
+                    int zijnPoort = int.Parse(clientIn.ReadLine().Split()[1]);
 
-                Console.WriteLine("Client maakt verbinding: " + zijnPoort);
+                    Console.WriteLine("Client maakt verbinding: " + zijnPoort);
 
-                // Zet de nieuwe verbinding in de verbindingslijst
-                Program.Buren.Add(zijnPoort, new Connection(clientIn, clientOut));
+                    lock (locker)
+                    {
+                        // Zet de nieuwe verbinding in de verbindingslijst
+                        Program.Buren.Add(zijnPoort, new Connection(clientIn, clientOut));
+                    }
+                }
+                catch { }
             }
         }
     }

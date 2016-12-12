@@ -10,7 +10,7 @@ namespace MultiClientServer
     {
         static public int MijnPoort;
         static int numberOfNeighbors;
-
+        static object locker = new object();
         static public Dictionary<int, Connection> Buren = new Dictionary<int, Connection>();
 
         static void Main(string[] args)
@@ -22,13 +22,16 @@ namespace MultiClientServer
             MijnPoort = int.Parse(args[0]);
             new Server(MijnPoort);
 
-            for(int i = 1; i < numberOfNeighbors; i++)
+            try
             {
-                int port = int.Parse(args[i]);
-                Buren.Add(port, new Connection(port));
+                for (int i = 1; i < numberOfNeighbors; i++)
+                {
+                    int port = int.Parse(args[i]);
+                    Buren.Add(port, new Connection(port));
+                }
             }
 
-            
+            catch { }
 
             //while (true)
             //{

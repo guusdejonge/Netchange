@@ -43,8 +43,9 @@ namespace MultiClientServer
                         // Zet de nieuwe verbinding in de verbindingslijst
                         Program.Buren.Add(zijnPoort, new Connection(clientIn, clientOut));
                     }
+                    
                 }
-                catch { }
+                catch { Thread.Sleep(100); }
             }
         }
     }

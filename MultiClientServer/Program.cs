@@ -17,21 +17,32 @@ namespace MultiClientServer
         {
 
             Console.Title = args[0];
-            numberOfNeighbors = args.Length - 1;
-            
+            numberOfNeighbors = args.Length;
+
             MijnPoort = int.Parse(args[0]);
             new Server(MijnPoort);
+
+            int teller = 0;
+
 
             try
             {
                 for (int i = 1; i < numberOfNeighbors; i++)
                 {
                     int port = int.Parse(args[i]);
-                    Buren.Add(port, new Connection(port));
+                    lock (locker)
+                    {
+                        if (port > MijnPoort)
+                        {
+                            Buren.Add(port, new Connection(port));
+                            teller++;
+                        }
+                        else { }
+                    }
                 }
             }
 
-            catch { }
+            catch { Thread.Sleep(100); }
 
             //while (true)
             //{

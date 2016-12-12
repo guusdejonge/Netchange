@@ -8,14 +8,16 @@ namespace MultiClientServer
     class Program
     {
         static public int MijnPoort;
-        //eded
+
         static public Dictionary<int, Connection> Buren = new Dictionary<int, Connection>();
 
         static void Main(string[] args)
         {
+            string testttttt = args[0];
             Console.Write("Op welke poort ben ik server? ");
             MijnPoort = int.Parse(Console.ReadLine());
             new Server(MijnPoort);
+            
 
             Console.WriteLine("Typ [verbind poortnummer] om verbinding te maken, bijvoorbeeld: verbind 1100");
             Console.WriteLine("Typ [poortnummer bericht] om een bericht te sturen, bijvoorbeeld: 1100 hoi hoi");

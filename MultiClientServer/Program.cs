@@ -86,8 +86,19 @@ namespace MultiClientServer
                     }
                     else if(input[0] == "B")
                     {
-                        Connection test = Buren[int.Parse(input[1])];
-                        test.SendMessage(input[2]);
+                        int port = int.Parse(input[1]);
+                        Connection verbinding;
+                        if (Buren.TryGetValue(port, out verbinding))
+                        {
+                            verbinding.SendMessage(input[2]);
+                            Buren.Remove(port);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Poort " + port + " is niet bekend");
+                        }
+
+                        
                     }
                     else if (input[0] == "C")
                     {
@@ -96,10 +107,20 @@ namespace MultiClientServer
                     }
                     else if (input[0] == "D")
                     {
+                        
                         int port = int.Parse(input[1]);
-                        Connection verbinding = Buren[port];
-                        verbinding.SendMessage(String.Format("D {0}", Convert.ToString(MijnPoort)));
-                        Buren.Remove(port);
+                        Connection verbinding;
+                        if (Buren.TryGetValue(port, out verbinding))
+                        {
+                            verbinding.SendMessage(String.Format("D {0}", Convert.ToString(MijnPoort)));
+                            Buren.Remove(port);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Poort " + port + " is niet bekend");
+                        }
+                        
+                        
                     }
                 }
                     

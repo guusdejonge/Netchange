@@ -89,6 +89,11 @@ namespace MultiClientServer
                         Connection test = Buren[int.Parse(input[1])];
                         test.SendMessage(input[2]);
                     }
+                    else if (input[0] == "C")
+                    {
+                        int poort = int.Parse(input[1]);
+                        Buren.Add(poort, new Connection(poort));
+                    }
                 }
                     
             }

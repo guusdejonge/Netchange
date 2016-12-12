@@ -46,7 +46,17 @@ namespace MultiClientServer
             try
             {
                 while (true)
-                    Console.WriteLine(Read.ReadLine());
+                {
+                    string input = Read.ReadLine();
+                    string[] input2 = input.Split(' ');
+                    if (input2[0] == "D")
+                    {
+                        int port = int.Parse(input2[1]);
+                        
+                         Program.Buren.Remove(port);
+                    }
+                    Console.WriteLine(input);
+                }
             }
             catch { } // Verbinding is kennelijk verbroken
         }

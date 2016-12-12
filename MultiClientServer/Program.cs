@@ -82,7 +82,7 @@ namespace MultiClientServer
                     string[] input = Console.ReadLine().Split(' ');
                     if (input[0] == "R")
                     {
-                        Console.WriteLine("R doet het");
+                        foreach(int port in Buren.Keys) { Console.WriteLine(port); }
                     }
                     else if(input[0] == "B")
                     {
@@ -93,6 +93,13 @@ namespace MultiClientServer
                     {
                         int poort = int.Parse(input[1]);
                         Buren.Add(poort, new Connection(poort));
+                    }
+                    else if (input[0] == "D")
+                    {
+                        int port = int.Parse(input[1]);
+                        Connection verbinding = Buren[port];
+                        verbinding.SendMessage(String.Format("D {0}", Convert.ToString(MijnPoort)));
+                        Buren.Remove(port);
                     }
                 }
                     

@@ -50,5 +50,10 @@ namespace MultiClientServer
             }
             catch { } // Verbinding is kennelijk verbroken
         }
+
+        public void SendMessage(string message)
+        {
+            Write.WriteLine(message);
+        }
     }
 }

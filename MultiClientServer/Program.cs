@@ -44,6 +44,8 @@ namespace MultiClientServer
 
             catch { Thread.Sleep(100); }
 
+            ReadInput();
+
             //while (true)
             //{
             //    string input = Console.ReadLine();
@@ -69,6 +71,28 @@ namespace MultiClientServer
             //            Buren[poort].Write.WriteLine(MijnPoort + ": " + delen[1]);
             //    }
             //}
+        }
+
+        static public void ReadInput()
+        {
+            try
+            {
+                while (true)
+                {
+                    string[] input = Console.ReadLine().Split(' ');
+                    if (input[0] == "R")
+                    {
+                        Console.WriteLine("R doet het");
+                    }
+                    else if(input[0] == "B")
+                    {
+                        Connection test = Buren[int.Parse(input[1])];
+                        test.SendMessage(input[2]);
+                    }
+                }
+                    
+            }
+            catch { } // Verbinding is kennelijk verbroken
         }
     }
 }

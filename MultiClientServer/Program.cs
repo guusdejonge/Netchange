@@ -15,6 +15,7 @@ namespace MultiClientServer
         static public Dictionary<int, int> Duv = new Dictionary<int, int>(); //schatting in u van distance u naar v
         static public Dictionary<int, int> Nbuv = new Dictionary<int, int>(); //node u's preferred neighbor voor v
         static public Dictionary<Tuple<int,int>, int> ndisuwv = new Dictionary<Tuple<int, int>,int>(); //node u's kennis over w's afstand tot v
+        static public int N = 20;
 
         static void Main(string[] args)
         {
@@ -48,40 +49,77 @@ namespace MultiClientServer
             catch { Thread.Sleep(100); }
 
             ReadInput();
-
-            //while (true)
-            //{
-            //    string input = Console.ReadLine();
-            //    if (input.StartsWith("verbind"))
-            //    {
-            //        int poort = int.Parse(input.Split()[1]);
-            //        if (Buren.ContainsKey(poort))
-            //            Console.WriteLine("Hier is al verbinding naar!");
-            //        else
-            //        {
-            //            // Leg verbinding aan (als client)
-            //            Buren.Add(poort, new Connection(poort));
-            //        }
-            //    }
-            //    else
-            //    {
-            //        // Stuur berichtje
-            //        string[] delen = input.Split(new char[] { ' ' }, 2);
-            //        int poort = int.Parse(delen[0]);
-            //        if (!Buren.ContainsKey(poort))
-            //            Console.WriteLine("Hier is al verbinding naar!");
-            //        else
-            //            Buren[poort].Write.WriteLine(MijnPoort + ": " + delen[1]);
-            //    }
-            //}
         }
 
         static void init()
         {
+            
 
+            foreach (int buur in Buren.Keys)
+            {
+                foreach(int buur2 in Buren.Keys)
+                {
+                    Tuple<int,int> t = new Tuple<int,int> (buur, buur2);
+                    ndisuwv.Add(t, N);
+                }
+            }
+
+            Duv.Add(MijnPoort, 0);
+            Nbuv.Add(MijnPoort, MijnPoort); //jezelf is dus local
+
+            foreach(int buur in Buren.Keys)
+            {
+                Duv.Add(buur, 1);
+                Nbuv.Add(buur, 0); //zelfde buur is undefined
+            }
         }
 
+        static void RecomputeAll()
+        {
+            foreach(int v in Duv.Keys)
+            {
+                Recompute(v);
+            }
+        }
 
+        static void Recompute(int v)
+        {
+            int DuvFirst = Duv[v];
+
+            if (v == MijnPoort)
+            {
+                Duv[v] = 0;
+                Nbuv[v] = MijnPoort;
+            }
+            else
+            {
+                int laagstebuur = Buren.First().Key;
+                foreach(int buur in Buren.Keys)
+                {
+                    if(ndisuwv[new Tuple<int,int>(buur,v)] < ndisuwv[new Tuple<int,int> (laagstebuur,v)])
+                    {
+                        laagstebuur = buur;
+                    }
+                }
+                int d = 1 + ndisuwv[new Tuple<int, int>(laagstebuur, v)];
+
+                if(d < N)   //hier wel te bereiken
+                {
+                    Duv[v] = d;
+                    Nbuv[v] = laagstebuur;
+                }
+                else    //hier niet te bereiken
+                {
+                    Duv[v] = N;
+                    Nbuv[v] = 0;
+                }
+            }
+
+            if (DuvFirst != Duv[v])
+            {
+                //foreach(int buur)
+            }
+        }
 
         static public void ReadInput()
         {

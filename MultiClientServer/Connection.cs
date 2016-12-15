@@ -53,13 +53,33 @@ namespace MultiClientServer
                     {
                         int port = int.Parse(input2[1]);
                         
-                         Program.Buren.Remove(port);
+                        Program.Buren.Remove(port);
                     }
                     else if (input2[0] == "mydist")
                     {
+                       
                         int v = int.Parse(input2[1]);
                         int Dwv = int.Parse(input2[2]);
                         int w = int.Parse(input2[3]);
+
+                        if (!Program.Duv.ContainsKey(v))        //stel hij heeft v nog niet
+                        {
+                            Program.Duv.Add(v, 20);
+                            foreach(int node in Program.Duv.Keys)
+                            {
+                                if (node < v)
+                                {
+                                    Program.ndisuwv[new Tuple<int, int>(node, v)] = 20;
+                                }
+                                else
+                                {
+                                    Program.ndisuwv[new Tuple<int, int>(v, node)] = 20;
+                                }
+                            }
+
+                        }
+
+                        Program.Duv[v] = Dwv + 1;
                         if (v > w)
                         {
                             Program.ndisuwv[new Tuple<int, int>(w, v)] = Dwv;
@@ -68,6 +88,8 @@ namespace MultiClientServer
                         {
                             Program.ndisuwv[new Tuple<int, int>(v, w)] = Dwv;
                         }
+
+
                         Program.Recompute(v);
                     }
                     Console.WriteLine(input);

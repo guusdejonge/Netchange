@@ -59,8 +59,11 @@ namespace MultiClientServer
             {
                 foreach (int buur2 in Buren.Keys)
                 {
-                    Tuple<int, int> t = new Tuple<int, int>(buur, buur2);
-                    ndisuwv.Add(t, N);
+                    if (buur2 > buur)
+                    {
+                        Tuple<int, int> t = new Tuple<int, int>(buur, buur2);
+                        ndisuwv.Add(t, N);
+                    }
                 }
             }
 
@@ -74,15 +77,7 @@ namespace MultiClientServer
             }
         }
 
-        static void RecomputeAll()
-        {
-            foreach (int v in Duv.Keys)
-            {
-                Recompute(v);
-            }
-        }
-
-        static void Recompute(int v)
+        static public void Recompute(int v)
         {
             int DuvFirst = Duv[v];
 
@@ -119,7 +114,7 @@ namespace MultiClientServer
             {
                 foreach (int buur in Buren.Keys)
                 {
-                    string bericht = String.Format("mydist {0} {1}", v, Duv[v]);
+                    string bericht = String.Format("mydist {0} {1} {2}", v, Duv[v], MijnPoort);
 
                     Connection verbinding = Buren[buur];
                     verbinding.SendMessage(bericht);

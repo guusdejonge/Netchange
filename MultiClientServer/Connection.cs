@@ -55,6 +55,21 @@ namespace MultiClientServer
                         
                          Program.Buren.Remove(port);
                     }
+                    else if (input2[0] == "mydist")
+                    {
+                        int v = int.Parse(input2[1]);
+                        int Dwv = int.Parse(input2[2]);
+                        int w = int.Parse(input2[3]);
+                        if (v > w)
+                        {
+                            Program.ndisuwv[new Tuple<int, int>(w, v)] = Dwv;
+                        }
+                        else
+                        {
+                            Program.ndisuwv[new Tuple<int, int>(v, w)] = Dwv;
+                        }
+                        Program.Recompute(v);
+                    }
                     Console.WriteLine(input);
                 }
             }

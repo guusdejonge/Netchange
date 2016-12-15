@@ -14,7 +14,7 @@ namespace MultiClientServer
         static public Dictionary<int, Connection> Buren = new Dictionary<int, Connection>();
         static public Dictionary<int, int> Duv = new Dictionary<int, int>(); //schatting in u van distance u naar v
         static public Dictionary<int, int> Nbuv = new Dictionary<int, int>(); //node u's preferred neighbor voor v
-        static public Dictionary<Tuple<int,int>, int> ndisuwv = new Dictionary<Tuple<int, int>,int>(); //node u's kennis over w's afstand tot v
+        static public Dictionary<Tuple<int, int>, int> ndisuwv = new Dictionary<Tuple<int, int>, int>(); //node u's kennis over w's afstand tot v
         static public int N = 20;
 
         static void Main(string[] args)
@@ -47,19 +47,19 @@ namespace MultiClientServer
             }
 
             catch { Thread.Sleep(100); }
-
+            init();
             ReadInput();
         }
 
         static void init()
         {
-            
+
 
             foreach (int buur in Buren.Keys)
             {
-                foreach(int buur2 in Buren.Keys)
+                foreach (int buur2 in Buren.Keys)
                 {
-                    Tuple<int,int> t = new Tuple<int,int> (buur, buur2);
+                    Tuple<int, int> t = new Tuple<int, int>(buur, buur2);
                     ndisuwv.Add(t, N);
                 }
             }
@@ -67,16 +67,16 @@ namespace MultiClientServer
             Duv.Add(MijnPoort, 0);
             Nbuv.Add(MijnPoort, MijnPoort); //jezelf is dus local
 
-            foreach(int buur in Buren.Keys)
+            foreach (int buur in Buren.Keys)
             {
                 Duv.Add(buur, 1);
-                Nbuv.Add(buur, 0); //zelfde buur is undefined
+                Nbuv.Add(buur, buur); //zelfde buur is undefined
             }
         }
 
         static void RecomputeAll()
         {
-            foreach(int v in Duv.Keys)
+            foreach (int v in Duv.Keys)
             {
                 Recompute(v);
             }
@@ -94,16 +94,16 @@ namespace MultiClientServer
             else
             {
                 int laagstebuur = Buren.First().Key;
-                foreach(int buur in Buren.Keys)
+                foreach (int buur in Buren.Keys)
                 {
-                    if(ndisuwv[new Tuple<int,int>(buur,v)] < ndisuwv[new Tuple<int,int> (laagstebuur,v)])
+                    if (ndisuwv[new Tuple<int, int>(buur, v)] < ndisuwv[new Tuple<int, int>(laagstebuur, v)])
                     {
                         laagstebuur = buur;
                     }
                 }
                 int d = 1 + ndisuwv[new Tuple<int, int>(laagstebuur, v)];
 
-                if(d < N)   //hier wel te bereiken
+                if (d < N)   //hier wel te bereiken
                 {
                     Duv[v] = d;
                     Nbuv[v] = laagstebuur;
@@ -117,7 +117,13 @@ namespace MultiClientServer
 
             if (DuvFirst != Duv[v])
             {
-                //foreach(int buur)
+                foreach (int buur in Buren.Keys)
+                {
+                    string bericht = String.Format("mydist {0} {1}", v, Duv[v]);
+
+                    Connection verbinding = Buren[buur];
+                    verbinding.SendMessage(bericht);
+                }
             }
         }
 
@@ -130,9 +136,19 @@ namespace MultiClientServer
                     string[] input = Console.ReadLine().Split(' ');
                     if (input[0] == "R")
                     {
-                        foreach(int port in Buren.Keys) { Console.WriteLine(port); }
+                        foreach (int port in Nbuv.Keys)
+                        {
+                            int dist = Duv[port];
+                            int neigh = Nbuv[port];
+                            if (neigh == MijnPoort) { Console.WriteLine(String.Format("{0} {1} local", port, dist)); }
+                            else
+                            {
+                                Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
+
+                            }
+                        }
                     }
-                    else if(input[0] == "B")
+                    else if (input[0] == "B")
                     {
                         int port = int.Parse(input[1]);
                         Connection verbinding;
@@ -146,7 +162,7 @@ namespace MultiClientServer
                             Console.WriteLine("Poort " + port + " is niet bekend");
                         }
 
-                        
+
                     }
                     else if (input[0] == "C")
                     {
@@ -155,7 +171,7 @@ namespace MultiClientServer
                     }
                     else if (input[0] == "D")
                     {
-                        
+
                         int port = int.Parse(input[1]);
                         Connection verbinding;
                         if (Buren.TryGetValue(port, out verbinding))
@@ -167,11 +183,11 @@ namespace MultiClientServer
                         {
                             Console.WriteLine("Poort " + port + " is niet bekend");
                         }
-                        
-                        
+
+
                     }
                 }
-                    
+
             }
             catch { } // Verbinding is kennelijk verbroken
         }

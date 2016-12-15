@@ -12,6 +12,9 @@ namespace MultiClientServer
         static int numberOfNeighbors;
         static object locker = new object();
         static public Dictionary<int, Connection> Buren = new Dictionary<int, Connection>();
+        static public Dictionary<int, int> Duv = new Dictionary<int, int>(); //schatting in u van distance u naar v
+        static public Dictionary<int, int> Nbuv = new Dictionary<int, int>(); //node u's preferred neighbor voor v
+        static public Dictionary<Tuple<int,int>, int> ndisuwv = new Dictionary<Tuple<int, int>,int>(); //node u's kennis over w's afstand tot v
 
         static void Main(string[] args)
         {
@@ -72,6 +75,13 @@ namespace MultiClientServer
             //    }
             //}
         }
+
+        static void init()
+        {
+
+        }
+
+
 
         static public void ReadInput()
         {

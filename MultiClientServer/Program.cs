@@ -26,23 +26,17 @@ namespace MultiClientServer
             MijnPoort = int.Parse(args[0]);
             new Server(MijnPoort);
 
-            int teller = 0;
-
-
             try
             {
                 for (int i = 1; i < numberOfNeighbors; i++)
                 {
-                    int port = int.Parse(args[i]);
-                    lock (locker)
+                    int poort = int.Parse(args[i]);
+
+                    if (poort > MijnPoort)
                     {
-                        if (port > MijnPoort)
-                        {
-                            Buren.Add(port, new Connection(port));
-                            teller++;
-                        }
-                        else { }
+                        addBuur(poort, new Connection(poort));
                     }
+                    else { }
                 }
             }
 
@@ -53,27 +47,24 @@ namespace MultiClientServer
 
         static void init()
         {
-
-
-            foreach (int buur in Buren.Keys)
+            foreach (int buur1 in Buren.Keys)
             {
                 foreach (int buur2 in Buren.Keys)
                 {
-                    if (buur2 > buur)
+                    if (buur2 > buur1)
                     {
-                        Tuple<int, int> t = new Tuple<int, int>(buur, buur2);
-                        ndisuwv.Add(t, N);
+                        addNdisuvw(buur1, buur2, N);    
                     }
                 }
             }
 
-            Duv.Add(MijnPoort, 0);
-            Nbuv.Add(MijnPoort, MijnPoort); //jezelf is dus local
+            addDuv(MijnPoort, 0);
+            addNbuv(MijnPoort, MijnPoort);
 
             foreach (int buur in Buren.Keys)
             {
-                Duv.Add(buur, 1);
-                Nbuv.Add(buur, buur); //zelfde buur is undefined
+                addDuv(buur, 1);
+                addNbuv(buur, buur);
             }
         }
 
@@ -163,6 +154,13 @@ namespace MultiClientServer
                     Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
 
                 }
+
+
+            }
+            Console.WriteLine();
+            foreach (Tuple<int, int> tuple in ndisuwv.Keys)
+            {
+                Console.WriteLine(String.Format("{0} {1} {2}", tuple.Item1, tuple.Item2, ndisuwv[tuple]));
             }
         }
 
@@ -199,6 +197,45 @@ namespace MultiClientServer
             else
             {
                 Console.WriteLine("Poort " + port + " is niet bekend");
+            }
+        }
+
+        static public void addBuur(int poort, Connection verbinding)
+        {
+            lock (locker)
+            {
+                Buren.Add(poort, verbinding);
+            }
+        }
+
+        static void addDuv(int poort, int afstand)
+        {
+            if (!Duv.ContainsKey(poort))
+            {
+                lock (locker)
+                {
+                    Duv.Add(poort, afstand);
+                }
+            }
+        }
+
+        static void addNbuv(int poort, int buurPoort)
+        {
+            if (!Nbuv.ContainsKey(poort))
+            {
+                lock (locker)
+                {
+                    Nbuv.Add(poort, buurPoort);
+                }
+            }
+        }
+
+        static void addNdisuvw(int buur1, int buur2, int afstand)
+        {
+            Tuple<int, int> tuple = new Tuple<int, int>(buur1, buur2);
+            lock (locker)
+            {
+                ndisuwv.Add(tuple, afstand);
             }
         }
     }

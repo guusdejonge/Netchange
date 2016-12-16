@@ -13,6 +13,7 @@ namespace MultiClientServer
     {
         public StreamReader Read;
         public StreamWriter Write;
+        static readonly object locker = new object();
 
         // Connection heeft 2 constructoren: deze constructor wordt gebruikt als wij CLIENT worden bij een andere SERVER
         public Connection(int port)
@@ -72,8 +73,10 @@ namespace MultiClientServer
         void inputD(string[] input)
         {
             int port = int.Parse(input[1]);
-
-            Program.Buren.Remove(port);
+            lock (locker)
+            {
+                Program.Buren.Remove(port);
+            }
         }
 
         void inputMyDist(string[] input)

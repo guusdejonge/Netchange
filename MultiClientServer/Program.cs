@@ -129,62 +129,77 @@ namespace MultiClientServer
                 while (true)
                 {
                     string[] input = Console.ReadLine().Split(' ');
-                    if (input[0] == "R")
+                    string inputSwitch = input[0];
+
+                    switch (inputSwitch)
                     {
-                        foreach (int port in Nbuv.Keys)
-                        {
-                            int dist = Duv[port];
-                            int neigh = Nbuv[port];
-                            if (neigh == MijnPoort) { Console.WriteLine(String.Format("{0} {1} local", port, dist)); }
-                            else
-                            {
-                                Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
-
-                            }
-                        }
-                    }
-                    else if (input[0] == "B")
-                    {
-                        int port = int.Parse(input[1]);
-                        Connection verbinding;
-                        if (Buren.TryGetValue(port, out verbinding))
-                        {
-                            verbinding.SendMessage(input[2]);
-                            Buren.Remove(port);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Poort " + port + " is niet bekend");
-                        }
-
-
-                    }
-                    else if (input[0] == "C")
-                    {
-                        int poort = int.Parse(input[1]);
-                        Buren.Add(poort, new Connection(poort));
-                    }
-                    else if (input[0] == "D")
-                    {
-
-                        int port = int.Parse(input[1]);
-                        Connection verbinding;
-                        if (Buren.TryGetValue(port, out verbinding))
-                        {
-                            verbinding.SendMessage(String.Format("D {0}", Convert.ToString(MijnPoort)));
-                            Buren.Remove(port);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Poort " + port + " is niet bekend");
-                        }
-
-
+                        case "R":
+                            inputR();
+                            break;
+                        case "B":
+                            inputB(input);
+                            break;
+                        case "C":
+                            inputC(input);
+                            break;
+                        case "D":
+                            inputD(input);
+                            break;
                     }
                 }
-
             }
             catch { } // Verbinding is kennelijk verbroken
+        }
+
+        static void inputR()
+        {
+            foreach (int port in Nbuv.Keys)
+            {
+                int dist = Duv[port];
+                int neigh = Nbuv[port];
+                if (neigh == MijnPoort) { Console.WriteLine(String.Format("{0} {1} local", port, dist)); }
+                else
+                {
+                    Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
+
+                }
+            }
+        }
+
+        static void inputB(string[] input)
+        {
+            int port = int.Parse(input[1]);
+            Connection verbinding;
+            if (Buren.TryGetValue(port, out verbinding))
+            {
+                verbinding.SendMessage(input[2]);
+                Buren.Remove(port);
+            }
+            else
+            {
+                Console.WriteLine("Poort " + port + " is niet bekend");
+            }
+        }
+
+        static void inputC(string[] input)
+        {
+            int poort = int.Parse(input[1]);
+            Buren.Add(poort, new Connection(poort));
+        }
+
+        static void inputD(string[] input)
+        {
+            int port = int.Parse(input[1]);
+            Connection verbinding;
+            if (Buren.TryGetValue(port, out verbinding))
+            {
+                verbinding.SendMessage(String.Format("D {0}", Convert.ToString(MijnPoort)));
+                Buren.Remove(port);
+            }
+            else
+            {
+                Console.WriteLine("Poort " + port + " is niet bekend");
+            }
         }
     }
 }

@@ -47,52 +47,18 @@ namespace MultiClientServer
             {
                 while (true)
                 {
-                    string input = Read.ReadLine();
-                    string[] input2 = input.Split(' ');
-                    if (input2[0] == "D")
+                    string[] input = Read.ReadLine().Split(' ');
+                    string inputSwitch = input[0];
+
+                    switch (inputSwitch)
                     {
-                        int port = int.Parse(input2[1]);
-                        
-                        Program.Buren.Remove(port);
-                    }
-                    else if (input2[0] == "mydist")
-                    {
-                       
-                        int v = int.Parse(input2[1]);
-                        int Dwv = int.Parse(input2[2]);
-                        int w = int.Parse(input2[3]);
-
-                        if (!Program.Duv.ContainsKey(v))        //stel hij heeft v nog niet
-                        {
-                            Program.Duv.Add(v, 20);
-                            foreach(int node in Program.Duv.Keys)
-                            {
-                                if (node < v)
-                                {
-                                    Program.ndisuwv[new Tuple<int, int>(node, v)] = 20;
-                                }
-                                else
-                                {
-                                    Program.ndisuwv[new Tuple<int, int>(v, node)] = 20;
-                                }
-                            }
-
-                        }
-
-                        Program.Duv[v] = Dwv + 1;
-                        if (v > w)
-                        {
-                            Program.ndisuwv[new Tuple<int, int>(w, v)] = Dwv;
-                        }
-                        else
-                        {
-                            Program.ndisuwv[new Tuple<int, int>(v, w)] = Dwv;
-                        }
-
-
-                        Program.Recompute(v);
-                    }
-                    Console.WriteLine(input);
+                        case "D":
+                            inputD(input);
+                            break;
+                        case "mydist":
+                            inputMyDist(input);
+                            break;
+                    }  
                 }
             }
             catch { } // Verbinding is kennelijk verbroken
@@ -101,6 +67,51 @@ namespace MultiClientServer
         public void SendMessage(string message)
         {
             Write.WriteLine(message);
+        }
+
+        void inputD(string[] input)
+        {
+            int port = int.Parse(input[1]);
+
+            Program.Buren.Remove(port);
+        }
+
+        void inputMyDist(string[] input)
+        {
+            int v = int.Parse(input[1]);
+            int Dwv = int.Parse(input[2]);
+            int w = int.Parse(input[3]);
+
+            if (!Program.Duv.ContainsKey(v))        //stel hij heeft v nog niet
+            {
+                Program.Duv.Add(v, 20);
+                foreach (int node in Program.Duv.Keys)
+                {
+                    if (node < v)
+                    {
+                        Program.ndisuwv[new Tuple<int, int>(node, v)] = 20;
+                    }
+                    else
+                    {
+                        Program.ndisuwv[new Tuple<int, int>(v, node)] = 20;
+                    }
+                }
+
+            }
+
+            Program.Duv[v] = Dwv + 1;
+            if (v > w)
+            {
+                Program.ndisuwv[new Tuple<int, int>(w, v)] = Dwv;
+            }
+            else
+            {
+                Program.ndisuwv[new Tuple<int, int>(v, w)] = Dwv;
+            }
+
+
+            Program.Recompute(v);
+
         }
     }
 }

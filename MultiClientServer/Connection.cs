@@ -13,7 +13,6 @@ namespace MultiClientServer
     {
         public StreamReader Read;
         public StreamWriter Write;
-        static readonly object locker = new object();
 
         // Connection heeft 2 constructoren: deze constructor wordt gebruikt als wij CLIENT worden bij een andere SERVER
         public Connection(int port)
@@ -53,10 +52,10 @@ namespace MultiClientServer
 
                     switch (inputSwitch)
                     {
-                        case "D":
+                        case "D":               //de buur is gedelete (aan de andere kant is D .... ingevoerd)
                             inputD(input);
                             break;
-                        case "mydist":
+                        case "mydist":          //een andere buurt stuurt jou zijn nieuw afstand naar een v
                             inputMyDist(input);
                             break;
                     }  
@@ -72,49 +71,24 @@ namespace MultiClientServer
 
         void inputD(string[] input)
         {
-            int port = int.Parse(input[1]);
-            lock (locker)
-            {
-                Program.Buren.Remove(port);
-            }
+            int poort = int.Parse(input[1]);
+
+            Program.removeBuren(poort);
+
+            Program.Recompute(poort);
         }
 
-        void inputMyDist(string[] input)
+        void inputMyDist(string[] input)        //input: "mydist u v d"
         {
-            int v = int.Parse(input[1]);
-            int Dwv = int.Parse(input[2]);
-            int w = int.Parse(input[3]);
+            int u = int.Parse(input[1]);    //de buur die dit stuurt
+            int v = int.Parse(input[2]);    //de node waarnaar zijn afstand is veranderd
+            int d = int.Parse(input[3]);    //zijn nieuwe afstand daarnaartoe
 
-            if (!Program.Duv.ContainsKey(v))        //stel hij heeft v nog niet
-            {
-                Program.Duv.Add(v, 20);
-                foreach (int node in Program.Duv.Keys)
-                {
-                    if (node < v)
-                    {
-                        Program.ndisuwv[new Tuple<int, int>(node, v)] = 20;
-                    }
-                    else
-                    {
-                        Program.ndisuwv[new Tuple<int, int>(v, node)] = 20;
-                    }
-                }
+            Tuple<int, int> uv = new Tuple<int, int>(u, v);
 
-            }
-
-            Program.Duv[v] = Dwv + 1;
-            if (v > w)
-            {
-                Program.ndisuwv[new Tuple<int, int>(w, v)] = Dwv;
-            }
-            else
-            {
-                Program.ndisuwv[new Tuple<int, int>(v, w)] = Dwv;
-            }
-
-
-            Program.Recompute(v);
-
+            Program.addOrSetNdisuvw(uv, d);         //toevoegen of wijzigen nieuwe d
+            
+            Program.Recompute(v);       //en recompute
         }
     }
 }

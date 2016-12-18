@@ -11,7 +11,6 @@ namespace MultiClientServer
 {
     class Server
     {
-        object locker = new object();
         public Server(int port)
         {
             // Luister op de opgegeven poort naar verbindingen
@@ -38,23 +37,9 @@ namespace MultiClientServer
 
                     Console.WriteLine("Client maakt verbinding: " + zijnPoort);
 
+                    Program.addBuren(zijnPoort, new Connection(clientIn, clientOut));   // Zet de nieuwe verbinding in de verbindingslijst
 
-
-                    lock (locker)
-                    {
-                        // Zet de nieuwe verbinding in de verbindingslijst
-                        Program.Buren.Add(zijnPoort, new Connection(clientIn, clientOut));
-
-                        if (Program.Duv.ContainsKey(zijnPoort)) { Program.Duv[zijnPoort] = 1; }
-                        else { Program.Duv.Add(zijnPoort, 1); }
-
-                        if (Program.Nbuv.ContainsKey(zijnPoort)) { Program.Nbuv[zijnPoort] = zijnPoort; }
-                        else { Program.Nbuv.Add(zijnPoort,zijnPoort); }
-
-                    }
-
-                    //Program.Recompute(zijnPoort);
-
+                    Program.Recompute(zijnPoort);
                 }
                 catch { Thread.Sleep(100); }
             }

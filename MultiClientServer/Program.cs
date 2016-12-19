@@ -15,6 +15,11 @@ namespace MultiClientServer
         static public Dictionary<Tuple<int, int>, int> Ndisuwv = new Dictionary<Tuple<int, int>, int>();    //node u's kennis over w's afstand tot v
         static public int N = 20;
 
+        static object BurenLocker = new object();
+        static object DuvLocker = new object();
+        static object NbuvLocker = new object();
+        static object NdisuwvLocker = new object();
+
         static void Main(string[] args)
         {
             Console.Title = args[0];
@@ -41,6 +46,19 @@ namespace MultiClientServer
             ReadInput();
         }
 
+        static public void SendRoutingTable(Connection buur)
+        {
+            lock(DuvLocker)
+            {
+                foreach (int v in Duv.Keys)
+                {
+                    string bericht = "mydist " + MijnPoort + " " + v + " " + Duv[v];
+                    buur.SendMessage(bericht);
+                }
+            }
+            
+        }
+
         static void init()
         {
             addOrSetDuv(MijnPoort, 0);
@@ -59,70 +77,49 @@ namespace MultiClientServer
         {
             string bericht = "mydist " + MijnPoort + " " + v + " " + Duv[v];    //dus: "mydist mijnpoort anderepoort afstand"
 
-            foreach (Connection buur in Buren.Values)
+            lock(BurenLocker)
             {
-                buur.SendMessage(bericht);
+                foreach (Connection buur in Buren.Values)
+                {
+                    buur.SendMessage(bericht);
+                }
             }
+           
+            
         }
-
-        static public void Recompute(int v)         //v is de node waar iets mee gebeurt is
+        
+        static public void Recompute(int v)
         {
-            Console.WriteLine("Recompute van: " + v);
-            int afstandvoorrecompute;
+            int afstandvoor = Duv[v];
 
-            if (Duv.Keys.Contains(v))               //huidige afstand naar v (nodig om achteraf te kijken of deze veranderd is)
-            {
-                afstandvoorrecompute = Duv[v];
-            }
-            else
-            {
-                afstandvoorrecompute = 100;
-            }
-                 
             if (v == MijnPoort)                     //als je v zelf bent
             {
                 addOrSetDuv(v, 0);
                 addOrSetNbuv(v, MijnPoort);
             }
-            else if(Buren.ContainsKey(v))           // als v in je burenlijst zit
+            else if (Buren.ContainsKey(v))           // als v in je burenlijst zit
             {
                 addOrSetDuv(v, 1);
                 addOrSetNbuv(v, v);
             }
             else                                    //en anders: kijken wie je preferred neighbour is
             {
-                int laagsteafstand = N;                 //zet hem eerst op max afstand
-                int laagstebuur = Buren.First().Key;    //neem de eerste buur als standaard, zoek nu betere:
-                
-                foreach (int buur in Buren.Keys)
+                foreach (Tuple<int, int> tuple in Ndisuwv.Keys)
                 {
-                    int afstanddezebuur = Ndisuwv[new Tuple<int, int>(buur, v)];
-                    if ((afstanddezebuur < laagsteafstand))    //controleren of afstand lager is dan de huidige laagste
+                    if (tuple.Item2 == v)    //deze buur (Item1) heeft een afstand naar v
                     {
-                        laagsteafstand = afstanddezebuur;
-                        laagstebuur = buur;
+                        if (Ndisuwv[tuple] < Duv[v] && Ndisuwv[tuple] < 20)
+                        {
+                            Duv[v] = Ndisuwv[tuple] + 1;
+                            Nbuv[v] = tuple.Item1;
+                        }
                     }
-                }
-
-                int d = laagsteafstand + 1;   //jouw nieuwe laagste distance
-                if (d < N)   //check of v uberhaubt te bereiken is
-                {
-                    addOrSetDuv(v, d);
-                    addOrSetNbuv(v, laagstebuur);
-                }
-                else        //zo niet:
-                {
-                    addOrSetDuv(v, N);
-                    addOrSetNbuv(v, 0);
                 }
             }
 
-            Console.WriteLine("Resultaat recompute van v: " + v + " is d: " + Duv[v]);
-
-            if (afstandvoorrecompute != Duv[v])     //kijken of de afstand veranderd is
+            if (afstandvoor != Duv[v])
             {
-                Console.WriteLine("Doorsturen naar buren van nieuwe afstand naar v: " + v);
-                updateburen(v);   //zo ja: al je buren updaten over je nieuwe afstand naar v
+                updateburen(v);
             }
         }
 
@@ -211,7 +208,7 @@ namespace MultiClientServer
 
         static public void addBuren(int poort, Connection verbinding)
         {
-            lock (Buren)
+            lock (BurenLocker)
             {
                 Buren.Add(poort, verbinding);
             }
@@ -219,15 +216,15 @@ namespace MultiClientServer
 
         static public void removeBuren(int poort)
         {
-            lock (Buren)
+            lock (BurenLocker)
             {
                 Buren.Remove(poort);
             }
         }
 
-        static void addOrSetDuv(int poort, int afstand)
+        static public void addOrSetDuv(int poort, int afstand)
         {
-            lock (Duv)
+            lock (DuvLocker)
             {
                 if (Duv.ContainsKey(poort))
                 {
@@ -242,7 +239,7 @@ namespace MultiClientServer
 
         static void addOrSetNbuv(int poort, int prefBuurPoort)
         {
-            lock (Nbuv)
+            lock (NbuvLocker)
             {
                 if(Nbuv.ContainsKey(poort))
                 {
@@ -257,7 +254,7 @@ namespace MultiClientServer
 
         static public void addOrSetNdisuvw(Tuple<int, int> tuple, int afstand)
         {
-            lock (Ndisuwv)
+            lock (NdisuwvLocker)
             {
                 if (Ndisuwv.ContainsKey(tuple))
                 {

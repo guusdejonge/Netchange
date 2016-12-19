@@ -17,6 +17,8 @@ namespace MultiClientServer
         // Connection heeft 2 constructoren: deze constructor wordt gebruikt als wij CLIENT worden bij een andere SERVER
         public Connection(int port)
         {
+            
+
             TcpClient client = new TcpClient("localhost", port);
             Read = new StreamReader(client.GetStream());
             Write = new StreamWriter(client.GetStream());
@@ -24,9 +26,11 @@ namespace MultiClientServer
 
             // De server kan niet zien van welke poort wij client zijn, dit moeten we apart laten weten
             Write.WriteLine("Poort: " + Program.MijnPoort);
-
+            
             // Start het reader-loopje
             new Thread(ReaderThread).Start();
+
+            Program.SendRoutingTable(this);
         }
 
         // Deze constructor wordt gebruikt als wij SERVER zijn en een CLIENT maakt met ons verbinding
@@ -36,6 +40,8 @@ namespace MultiClientServer
 
             // Start het reader-loopje
             new Thread(ReaderThread).Start();
+
+            Program.SendRoutingTable(this);
         }
 
         // LET OP: Nadat er verbinding is gelegd, kun je vergeten wie er client/server is (en dat kun je aan het Connection-object dus ook niet zien!)
@@ -85,6 +91,11 @@ namespace MultiClientServer
             int d = int.Parse(input[3]);    //zijn nieuwe afstand daarnaartoe
 
             Tuple<int, int> uv = new Tuple<int, int>(u, v);
+            
+            if(!Program.Duv.Keys.Contains(v))
+            {
+                Program.addOrSetDuv(v, 20);
+            }
 
             Program.addOrSetNdisuvw(uv, d);         //toevoegen of wijzigen nieuwe d
             

@@ -17,3 +17,4 @@ C:\Users\Tim Smit\Documents\Netchange\MultiClientServer\obj\x86\Debug\MultiClien
 C:\Users\Tim Smit\Documents\Netchange\MultiClientServer\bin\Debug\MultiClientServer.exe
 C:\Users\Tim Smit\Documents\Netchange\MultiClientServer\bin\Debug\MultiClientServer.pdb
 C:\Users\Tim Smit\Documents\Netchange\MultiClientServer\obj\x86\Debug\MultiClientServer.csprojResolveAssemblyReference.cache
+C:\Users\Guus de Jonge\Documents\GitHub\Netchange\MultiClientServer\obj\x86\Debug\MultiClientServer.csprojResolveAssemblyReference.cache

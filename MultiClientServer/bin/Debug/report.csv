@@ -19,41 +19,16 @@ Let op: deze berekening is niet het definitieve cijfer. Dit is alleen maar een a
 ------------------------------------
 
 Testcase;Status;Tijd;Omschrijving
-Standaard;Incorrect;14,30;Opstarten netwerk
-Random;Incorrect;12,66;Opstarten netwerk
+Standaard;Incorrect;0,17;Opstarten netwerk
+2xStandaard;Incorrect;8,79;Opstarten netwerk
+2xStandaard;Incorrect;0,39;Opstarten netwerk
 
 ------------------------------------
 
-1;Standaard;Incorrect;14,30;Opstarten netwerk
+1;Standaard;Incorrect;0,17;Opstarten netwerk
 Test 1 - Standaard
 
 Fout bij opzetten netwerk - de routing-tabel is incorrect.
-De afstand van 55500 naar 55502 is niet correct (programma denkt 55503 moet 1 zijn).
-Het programma ziet de verbinding van 55500 naar 55503 niet.
-Het programma ziet de verbinding van 55500 naar 55504 niet.
-Het programma ziet de verbinding van 55500 naar 55505 niet.
-De afstand van 55501 naar 55500 is niet correct (programma denkt 55502 moet 1 zijn).
-De afstand van 55501 naar 55502 is niet correct (programma denkt 55503 moet 1 zijn).
-Het programma ziet de verbinding van 55501 naar 55503 niet.
-Het programma ziet de verbinding van 55501 naar 55504 niet.
-Het programma ziet de verbinding van 55501 naar 55505 niet.
-De afstand van 55502 naar 55500 is niet correct (programma denkt 55501 moet 1 zijn).
-De afstand van 55502 naar 55501 is niet correct (programma denkt 55502 moet 1 zijn).
-De afstand van 55502 naar 55503 is niet correct (programma denkt 55505 moet 1 zijn).
-Het programma ziet de verbinding van 55502 naar 55505 niet.
-Het programma ziet de verbinding van 55503 naar 55500 niet.
-Het programma ziet de verbinding van 55503 naar 55501 niet.
-De afstand van 55503 naar 55502 is niet correct (programma denkt 55501 moet 1 zijn).
-Het programma ziet de verbinding van 55503 naar 55504 niet.
-Het programma ziet de verbinding van 55504 naar 55500 niet.
-Het programma ziet de verbinding van 55504 naar 55501 niet.
-De afstand van 55504 naar 55502 is niet correct (programma denkt 55503 moet 1 zijn).
-Het programma ziet de verbinding van 55504 naar 55503 niet.
-Het programma ziet de verbinding van 55505 naar 55500 niet.
-Het programma ziet de verbinding van 55505 naar 55501 niet.
-Het programma ziet de verbinding van 55505 naar 55502 niet.
-De afstand van 55505 naar 55503 is niet correct (programma denkt 55502 moet 1 zijn).
-De afstand van 55505 naar 55504 is niet correct (programma denkt 55505 moet 1 zijn).
 
 Log
 start MultiClientServer.exe 55500 55501 55502
@@ -62,221 +37,27 @@ start MultiClientServer.exe 55502 55500 55501 55503 55504
 start MultiClientServer.exe 55503 55502 55505
 start MultiClientServer.exe 55504 55502 55505
 start MultiClientServer.exe 55505 55503 55504
-55501 < Client maakt verbinding: 55500
-55503 < Client maakt verbinding: 55502
-55505 < Client maakt verbinding: 55503
-55502 < Client maakt verbinding: 55501
-55505 < Client maakt verbinding: 55504
-55502 < Client maakt verbinding: 55500
-55504 < Client maakt verbinding: 55502
-55500 > R
-55501 > R
-55502 > R
-55503 > R
-55504 > R
-55505 > R
-55504 < 55504 0 local
-55501 < 55501 0 local
-55502 < 55502 0 local
-55503 < 55503 0 local
-55505 < 55505 0 local
-55500 < 55500 0 local
-55504 < 55505 1 55505
-55501 < 55502 1 55502
-55502 < 55503 1 55503
-55505 < 
-55503 < 55505 1 55505
-55504 < 
-55500 < 55501 1 55501
-55505 < 55503 55505 1
-55504 < 55502 55503 1
-55503 < 55502 1 55502
-55501 < 
-55502 < 55501 1 55501
-55501 < 55500 55501 1
-55500 < 55502 1 55502
-55505 < 55503 55502 1
-55503 < 
-55502 < 55500 1 55500
-55500 < 
-55503 < 55502 55503 1
-55501 < 55500 55502 1
-55505 < 55504 55505 1
-55500 < 55502 55503 1
-55502 < 55504 1 55504
-55501 < 55502 55503 1
-55503 < 55502 55501 1
-55502 < 
-55502 < 55501 55502 1
-55502 < 55503 55505 1
-55502 < 55500 55501 1
-
-Process 55500:
-> R
-55500 0 local
-55501 1 55501
-55502 1 55502
-
-55502 55503 1
-
-Process 55501:
-Client maakt verbinding: 55500
-> R
-55501 0 local
-55502 1 55502
-
-55500 55501 1
-55500 55502 1
-55502 55503 1
-
-Process 55502:
-Client maakt verbinding: 55501
-Client maakt verbinding: 55500
-> R
-55502 0 local
-55503 1 55503
-55501 1 55501
-55500 1 55500
-55504 1 55504
-
-55501 55502 1
-55503 55505 1
-55500 55501 1
-
-Process 55503:
-Client maakt verbinding: 55502
-> R
-55503 0 local
-55505 1 55505
-55502 1 55502
-
-55502 55503 1
-55502 55501 1
-
-Process 55504:
-Client maakt verbinding: 55502
-> R
-55504 0 local
-55505 1 55505
-
-55502 55503 1
-
-Process 55505:
-Client maakt verbinding: 55503
-Client maakt verbinding: 55504
-> R
-55505 0 local
-
-55503 55505 1
-55503 55502 1
-55504 55505 1
 
 ------------------------------------
 
-2;Random;Incorrect;12,66;Opstarten netwerk
-Test 2 - Random
+2;2xStandaard;Incorrect;8,79;Opstarten netwerk
+Test 2 - 2xStandaard
 
 Fout bij opzetten netwerk - de routing-tabel is incorrect.
-Het programma ziet de verbinding van 55500 naar 55501 niet.
-Het programma ziet de verbinding van 55500 naar 55502 niet.
-Het programma ziet de verbinding van 55500 naar 55503 niet.
-Het programma ziet de verbinding van 55500 naar 55504 niet.
-Het programma ziet de verbinding van 55500 naar 55505 niet.
-Het programma ziet de verbinding van 55500 naar 55506 niet.
-Het programma ziet de verbinding van 55500 naar 55507 niet.
-Het programma ziet de verbinding van 55500 naar 55508 niet.
-Het programma ziet de verbinding van 55501 naar 55500 niet.
-Het programma ziet de verbinding van 55501 naar 55502 niet.
-Het programma ziet de verbinding van 55501 naar 55503 niet.
-Het programma ziet de verbinding van 55501 naar 55504 niet.
-Het programma ziet de verbinding van 55501 naar 55505 niet.
-Het programma ziet de verbinding van 55501 naar 55506 niet.
-Het programma ziet de verbinding van 55501 naar 55507 niet.
-Het programma ziet de verbinding van 55501 naar 55508 niet.
-Het programma ziet de verbinding van 55502 naar 55500 niet.
-Het programma ziet de verbinding van 55502 naar 55501 niet.
-Het programma ziet de verbinding van 55502 naar 55503 niet.
-Het programma ziet de verbinding van 55502 naar 55504 niet.
-Het programma ziet de verbinding van 55502 naar 55505 niet.
-Het programma ziet de verbinding van 55502 naar 55506 niet.
-Het programma ziet de verbinding van 55502 naar 55507 niet.
-Het programma ziet de verbinding van 55502 naar 55508 niet.
-Het programma ziet de verbinding van 55503 naar 55500 niet.
-Het programma ziet de verbinding van 55503 naar 55501 niet.
-Het programma ziet de verbinding van 55503 naar 55502 niet.
-Het programma ziet de verbinding van 55503 naar 55504 niet.
-Het programma ziet de verbinding van 55503 naar 55505 niet.
-Het programma ziet de verbinding van 55503 naar 55506 niet.
-Het programma ziet de verbinding van 55503 naar 55507 niet.
-Het programma ziet de verbinding van 55503 naar 55508 niet.
-Het programma ziet de verbinding van 55504 naar 55500 niet.
-Het programma ziet de verbinding van 55504 naar 55501 niet.
-Het programma ziet de verbinding van 55504 naar 55502 niet.
-Het programma ziet de verbinding van 55504 naar 55503 niet.
-Het programma ziet de verbinding van 55504 naar 55505 niet.
-Het programma ziet de verbinding van 55504 naar 55506 niet.
-Het programma ziet de verbinding van 55504 naar 55507 niet.
-Het programma ziet de verbinding van 55504 naar 55508 niet.
-Het programma ziet de verbinding van 55505 naar 55500 niet.
-Het programma ziet de verbinding van 55505 naar 55501 niet.
-Het programma ziet de verbinding van 55505 naar 55502 niet.
-Het programma ziet de verbinding van 55505 naar 55503 niet.
-Het programma ziet de verbinding van 55505 naar 55504 niet.
-Het programma ziet de verbinding van 55505 naar 55506 niet.
-Het programma ziet de verbinding van 55505 naar 55507 niet.
-Het programma ziet de verbinding van 55505 naar 55508 niet.
-Het programma ziet de verbinding van 55506 naar 55500 niet.
-Het programma ziet de verbinding van 55506 naar 55501 niet.
-Het programma ziet de verbinding van 55506 naar 55502 niet.
-Het programma ziet de verbinding van 55506 naar 55503 niet.
-Het programma ziet de verbinding van 55506 naar 55504 niet.
-Het programma ziet de verbinding van 55506 naar 55505 niet.
-Het programma ziet de verbinding van 55506 naar 55507 niet.
-Het programma ziet de verbinding van 55506 naar 55508 niet.
-Het programma ziet de verbinding van 55507 naar 55500 niet.
-Het programma ziet de verbinding van 55507 naar 55501 niet.
-Het programma ziet de verbinding van 55507 naar 55502 niet.
-Het programma ziet de verbinding van 55507 naar 55503 niet.
-Het programma ziet de verbinding van 55507 naar 55504 niet.
-Het programma ziet de verbinding van 55507 naar 55505 niet.
-Het programma ziet de verbinding van 55507 naar 55506 niet.
-Het programma ziet de verbinding van 55507 naar 55508 niet.
-Het programma ziet de verbinding van 55508 naar 55500 niet.
-Het programma ziet de verbinding van 55508 naar 55501 niet.
-Het programma ziet de verbinding van 55508 naar 55502 niet.
-Het programma ziet de verbinding van 55508 naar 55503 niet.
-Het programma ziet de verbinding van 55508 naar 55504 niet.
-Het programma ziet de verbinding van 55508 naar 55505 niet.
-Het programma ziet de verbinding van 55508 naar 55506 niet.
-Het programma ziet de verbinding van 55508 naar 55507 niet.
 
 Log
-start MultiClientServer.exe 55500 55501 55502 55503 55506 55507
-start MultiClientServer.exe 55501 55500 55502 55504 55505 55506
-start MultiClientServer.exe 55502 55500 55501 55504
-start MultiClientServer.exe 55503 55500 55504 55505 55506 55508
-start MultiClientServer.exe 55504 55501 55502 55503 55506
-start MultiClientServer.exe 55505 55501 55503 55506
-start MultiClientServer.exe 55506 55500 55501 55503 55504 55505 55507
-start MultiClientServer.exe 55507 55500 55506
-start MultiClientServer.exe 55508 55503
-55502 < Client maakt verbinding: 55501
-55507 < Client maakt verbinding: 55506
-55506 < Client maakt verbinding: 55504
-55504 < Client maakt verbinding: 55502
-55501 < Client maakt verbinding: 55500
-55506 < Client maakt verbinding: 55505
-55504 < Client maakt verbinding: 55503
-55504 < Client maakt verbinding: 55501
-55502 < Client maakt verbinding: 55500
-55505 < Client maakt verbinding: 55503
-55505 < Client maakt verbinding: 55501
-55506 < Client maakt verbinding: 55503
-55503 < Client maakt verbinding: 55500
-55506 < Client maakt verbinding: 55500
-55508 < Client maakt verbinding: 55503
-55506 < Client maakt verbinding: 55501
-55507 < Client maakt verbinding: 55500
+start MultiClientServer.exe 55500 55501 55502
+start MultiClientServer.exe 55501 55500 55502
+start MultiClientServer.exe 55502 55500 55501 55503 55504
+start MultiClientServer.exe 55503 55502 55505
+start MultiClientServer.exe 55504 55502 55505
+start MultiClientServer.exe 55505 55503 55504
+start MultiClientServer.exe 55506 55507 55508
+start MultiClientServer.exe 55507 55506 55508
+start MultiClientServer.exe 55508 55506 55507 55509 55510
+start MultiClientServer.exe 55509 55508 55511
+start MultiClientServer.exe 55510 55508 55511
+start MultiClientServer.exe 55511 55509 55510
 55500 > R
 55501 > R
 55502 > R
@@ -286,49 +67,174 @@ start MultiClientServer.exe 55508 55503
 55506 > R
 55507 > R
 55508 > R
+55509 > R
+55510 > R
+55511 > R
 
 Process 55500:
 > R
 
 Process 55501:
-Client maakt verbinding: 55500
 > R
 
 Process 55502:
-Client maakt verbinding: 55501
-Client maakt verbinding: 55500
 > R
 
 Process 55503:
-Client maakt verbinding: 55500
 > R
 
 Process 55504:
-Client maakt verbinding: 55502
-Client maakt verbinding: 55503
-Client maakt verbinding: 55501
 > R
 
 Process 55505:
-Client maakt verbinding: 55503
-Client maakt verbinding: 55501
 > R
 
 Process 55506:
-Client maakt verbinding: 55504
-Client maakt verbinding: 55505
-Client maakt verbinding: 55503
-Client maakt verbinding: 55500
-Client maakt verbinding: 55501
 > R
 
 Process 55507:
-Client maakt verbinding: 55506
-Client maakt verbinding: 55500
 > R
 
 Process 55508:
-Client maakt verbinding: 55503
+> R
+
+Process 55509:
+> R
+
+Process 55510:
+> R
+
+Process 55511:
+> R
+
+------------------------------------
+
+3;2xStandaard;Incorrect;0,39;Opstarten netwerk
+Test 3 - 2xStandaard
+
+Fout bij opzetten netwerk - de routing-tabel is incorrect.
+Fout bij opzetten netwerk - de routing-tabel is incorrect.
+Het programma ziet de verbinding van 55500 naar 55501 niet.
+Het programma ziet de verbinding van 55500 naar 55502 niet.
+Het programma ziet de verbinding van 55500 naar 55503 niet.
+Het programma ziet de verbinding van 55500 naar 55504 niet.
+Het programma ziet de verbinding van 55500 naar 55505 niet.
+Het programma ziet de verbinding van 55501 naar 55500 niet.
+Het programma ziet de verbinding van 55501 naar 55502 niet.
+Het programma ziet de verbinding van 55501 naar 55503 niet.
+Het programma ziet de verbinding van 55501 naar 55504 niet.
+Het programma ziet de verbinding van 55501 naar 55505 niet.
+Het programma ziet de verbinding van 55502 naar 55500 niet.
+Het programma ziet de verbinding van 55502 naar 55501 niet.
+Het programma ziet de verbinding van 55502 naar 55503 niet.
+Het programma ziet de verbinding van 55502 naar 55504 niet.
+Het programma ziet de verbinding van 55502 naar 55505 niet.
+Het programma ziet de verbinding van 55503 naar 55500 niet.
+Het programma ziet de verbinding van 55503 naar 55501 niet.
+Het programma ziet de verbinding van 55503 naar 55502 niet.
+Het programma ziet de verbinding van 55503 naar 55504 niet.
+Het programma ziet de verbinding van 55503 naar 55505 niet.
+Het programma ziet de verbinding van 55504 naar 55500 niet.
+Het programma ziet de verbinding van 55504 naar 55501 niet.
+Het programma ziet de verbinding van 55504 naar 55502 niet.
+Het programma ziet de verbinding van 55504 naar 55503 niet.
+Het programma ziet de verbinding van 55504 naar 55505 niet.
+Het programma ziet de verbinding van 55505 naar 55500 niet.
+Het programma ziet de verbinding van 55505 naar 55501 niet.
+Het programma ziet de verbinding van 55505 naar 55502 niet.
+Het programma ziet de verbinding van 55505 naar 55503 niet.
+Het programma ziet de verbinding van 55505 naar 55504 niet.
+Het programma ziet de verbinding van 55506 naar 55507 niet.
+Het programma ziet de verbinding van 55506 naar 55508 niet.
+Het programma ziet de verbinding van 55506 naar 55509 niet.
+Het programma ziet de verbinding van 55506 naar 55510 niet.
+Het programma ziet de verbinding van 55506 naar 55511 niet.
+Het programma ziet de verbinding van 55507 naar 55506 niet.
+Het programma ziet de verbinding van 55507 naar 55508 niet.
+Het programma ziet de verbinding van 55507 naar 55509 niet.
+Het programma ziet de verbinding van 55507 naar 55510 niet.
+Het programma ziet de verbinding van 55507 naar 55511 niet.
+Het programma ziet de verbinding van 55508 naar 55506 niet.
+Het programma ziet de verbinding van 55508 naar 55507 niet.
+Het programma ziet de verbinding van 55508 naar 55509 niet.
+Het programma ziet de verbinding van 55508 naar 55510 niet.
+Het programma ziet de verbinding van 55508 naar 55511 niet.
+Het programma ziet de verbinding van 55509 naar 55506 niet.
+Het programma ziet de verbinding van 55509 naar 55507 niet.
+Het programma ziet de verbinding van 55509 naar 55508 niet.
+Het programma ziet de verbinding van 55509 naar 55510 niet.
+Het programma ziet de verbinding van 55509 naar 55511 niet.
+Het programma ziet de verbinding van 55510 naar 55506 niet.
+Het programma ziet de verbinding van 55510 naar 55507 niet.
+Het programma ziet de verbinding van 55510 naar 55508 niet.
+Het programma ziet de verbinding van 55510 naar 55509 niet.
+Het programma ziet de verbinding van 55510 naar 55511 niet.
+Het programma ziet de verbinding van 55511 naar 55506 niet.
+Het programma ziet de verbinding van 55511 naar 55507 niet.
+Het programma ziet de verbinding van 55511 naar 55508 niet.
+Het programma ziet de verbinding van 55511 naar 55509 niet.
+Het programma ziet de verbinding van 55511 naar 55510 niet.
+
+Log
+start MultiClientServer.exe 55500 55501 55502
+start MultiClientServer.exe 55501 55500 55502
+start MultiClientServer.exe 55502 55500 55501 55503 55504
+start MultiClientServer.exe 55503 55502 55505
+start MultiClientServer.exe 55504 55502 55505
+start MultiClientServer.exe 55505 55503 55504
+start MultiClientServer.exe 55506 55507 55508
+start MultiClientServer.exe 55507 55506 55508
+start MultiClientServer.exe 55508 55506 55507 55509 55510
+start MultiClientServer.exe 55509 55508 55511
+start MultiClientServer.exe 55510 55508 55511
+start MultiClientServer.exe 55511 55509 55510
+55500 > R
+55501 > R
+55502 > R
+55503 > R
+55504 > R
+55505 > R
+55506 > R
+55507 > R
+55508 > R
+55509 > R
+55510 > R
+55511 > R
+
+Process 55500:
+> R
+
+Process 55501:
+> R
+
+Process 55502:
+> R
+
+Process 55503:
+> R
+
+Process 55504:
+> R
+
+Process 55505:
+> R
+
+Process 55506:
+> R
+
+Process 55507:
+> R
+
+Process 55508:
+> R
+
+Process 55509:
+> R
+
+Process 55510:
+> R
+
+Process 55511:
 > R
 
 Microsoft Windows NT 6.2.9200.0 (x64)

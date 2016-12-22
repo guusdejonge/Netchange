@@ -86,48 +86,63 @@ namespace MultiClientServer
             int afstandvoor = readDuv(v);
             bool containsbuur = Nbuv.ContainsKey(v);
             int prefbuurvoor = 0;
+            Console.WriteLine("RECOMPUTE NAAR: " + v);
+            Console.WriteLine("afstand voor: " + afstandvoor);
             if (containsbuur)
             {
                 prefbuurvoor = readNbuv(v);
+              //  Console.WriteLine("Contains buur");
             }
+
+            addOrSetDuv(v, N);
 
             if (v == MijnPoort)                     //als je v zelf bent
             {
                 addOrSetDuv(v, 0);
                 addOrSetNbuv(v, MijnPoort);
+               // Console.WriteLine("Is mijn poort");
             }
             else if (Buren.ContainsKey(v))           // als v in je burenlijst zit
             {
                 addOrSetDuv(v, 1);
                 addOrSetNbuv(v, v);
+               // Console.WriteLine("Contains key");
             }
             else                                    //en anders: kijken wie je preferred neighbour is
             {
-                lock(Ndisuwv)
+              
+                lock (Ndisuwv)
                 {
                     foreach (Tuple<int, int> tuple in Ndisuwv.Keys)
                     {
+                        Console.WriteLine("test van " + tuple.Item1 + "naar: " + tuple.Item2);
                         if (tuple.Item2 == v)    //deze buur (Item1) heeft een afstand naar v
                         {
+                            Console.WriteLine("jaaaaaa");
                             if (Ndisuwv[tuple] < readDuv(v) && Ndisuwv[tuple] < 20)
                             {
+                                Console.WriteLine("updaten");
                                 addOrSetDuv(v, Ndisuwv[tuple] + 1);
                                 addOrSetNbuv(v, tuple.Item1);
                             }
                         }
                     }
                 }
+                Console.WriteLine("JA?");
             }
 
             if (afstandvoor != readDuv(v))
             {
-                Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v)); 
+                Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
+                Console.WriteLine("VERSTUREN NAAR BUREN");
                 updateburen(v);
             }
             else if (containsbuur == false || prefbuurvoor != readNbuv(v))
             {
                 Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
             }
+
+            Console.WriteLine("JA2?");
         }
 
         static public void ReadInput()
@@ -239,21 +254,34 @@ namespace MultiClientServer
                     
                     lock (Nbuv)
                     {
-                        foreach (int pref in Nbuv.Keys)
+                        foreach (KeyValuePair<int, int> entry in Nbuv)
                         {
-                            if (pref == poort)    //deze buur is net gedelete
+                            if (entry.Value == poort)    //deze buur is net gedelete
                             {
-                                veranderd.Add(pref); //hier ging hij heen                                
+                                veranderd.Add(entry.Key); //hier ging hij heen    
+                                Console.WriteLine("een");
+                                addOrSetDuv(entry.Key, N);
+                                Console.WriteLine("twee");
+                                //Recompute(entry.Key);
+                                Console.WriteLine("drie");
                             }
+                        }
+
+                        foreach (int pref in veranderd)
+                        {
+                            Recompute(pref);
+                            Console.WriteLine("vier");
                         }
                     }
 
+
                     Recompute(poort);           //recompute!
-                    foreach(int v in veranderd)
-                    {
-                        Recompute(v);
-                    }
-                    
+                   
+
+                   // foreach (int v in veranderd)
+                    //{
+                    //    Recompute(v);
+                    //}
                 }
                 else
                 {

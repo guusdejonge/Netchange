@@ -332,7 +332,7 @@ namespace MultiClientServer
             }
         }
 
-        static void addOrSetNbuv(int poort, int prefBuurPoort)
+        static public void addOrSetNbuv(int poort, int prefBuurPoort)
         {
             lock (Nbuv)
             {

@@ -151,7 +151,8 @@ namespace MultiClientServer
                             inputC(input);
                             break;
                         case "D":
-                            inputD(input);
+
+                            inputD(input, true);
                             break;
                     }
                 }
@@ -217,7 +218,7 @@ namespace MultiClientServer
             }
         }
 
-        static void inputD(string[] input)  //delete buur (input = D poortnummer)
+        static public void inputD(string[] input, bool sendmessage)  //delete buur (input = D poortnummer)
         {
             int poort = int.Parse(input[1]);
             Connection verbinding;
@@ -225,22 +226,24 @@ namespace MultiClientServer
             {
                 if (Buren.TryGetValue(poort, out verbinding))
                 {
-                    verbinding.SendMessage("D " + Convert.ToString(MijnPoort));
-                    Buren.Remove(poort);
-                    addOrSetDuv(poort, N);
+                    if (sendmessage)
+                    {
+                        verbinding.SendMessage("D " + Convert.ToString(MijnPoort));
+                    }
 
+                    Buren.Remove(poort);
+                    removeNdisuwv(poort);
+                    addOrSetDuv(poort, N);
                     
                     List<int> veranderd = new List<int>();
                     
-                    lock (Ndisuwv)
+                    lock (Nbuv)
                     {
-                        foreach (Tuple<int, int> tuple in Ndisuwv.Keys)
+                        foreach (int pref in Nbuv.Keys)
                         {
-                            if (tuple.Item1 == poort)    //deze buur is net gedelete
+                            if (pref == poort)    //deze buur is net gedelete
                             {
-                                veranderd.Add(tuple.Item2); //hier ging hij heen
-                                Ndisuwv.Remove(tuple);
-                                
+                                veranderd.Add(pref); //hier ging hij heen                                
                             }
                         }
                     }
@@ -356,6 +359,26 @@ namespace MultiClientServer
             lock (Ndisuwv)
             {
                 return Ndisuwv[tuple];
+            }
+        }
+
+        static public void removeNdisuwv(int poort)
+        {
+            List<Tuple<int,int>> verwijder = new List<Tuple<int, int>>();
+            lock (Ndisuwv)
+            {
+                foreach (Tuple<int, int> tuple in Ndisuwv.Keys)
+                {
+                    if (tuple.Item1 == poort)    //deze buur is net gedelete
+                    {
+                        verwijder.Add(tuple);
+                    }
+                }
+
+                foreach (Tuple<int, int> tuple in verwijder)
+                {
+                    Ndisuwv.Remove(tuple);
+                }
             }
         }
     }

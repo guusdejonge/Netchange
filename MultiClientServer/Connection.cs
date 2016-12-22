@@ -91,35 +91,7 @@ namespace MultiClientServer
         }
             void inputD(string[] input)
         {
-            int poort = int.Parse(input[1]);
-            Console.WriteLine("delete: " + poort);
-            Program.removeBuren(poort);
-            Program.addOrSetDuv(poort, 20);
-
-            List<int> veranderd = new List<int>();
-
-            lock (Program.Ndisuwv)
-            {
-                foreach (Tuple<int, int> tuple in Program.Ndisuwv.Keys)
-                {
-                    if (tuple.Item1 == poort)    //deze buur is net gedelete
-                    {
-                        veranderd.Add(tuple.Item2); //hier ging hij heen
-                        Program.Ndisuwv.Remove(tuple);
-
-                    }
-                }
-            }
-
-            lock(Program.Buren)
-            {
-                Program.Recompute(poort);           //recompute!
-                foreach (int v in veranderd)
-                {
-                    Program.Recompute(v);
-                }
-            }
-            
+            Program.inputD(input, false);
         }
 
         void inputMyDist(string[] input)        //input: "mydist u v d"

@@ -106,7 +106,11 @@ namespace MultiClientServer
             {
                 if (!Program.Duv.Keys.Contains(v))
                 {
-                    Program.Duv.Add(v, 20);
+                    Program.Duv.Add(v, Program.N);
+                    lock (Program.NLocker)
+                    {
+                      // Program.N = 5 + Program.Duv.Count();
+                    }
                 }
             }
             

@@ -14,6 +14,7 @@ namespace MultiClientServer
         static public Dictionary<int, int> Nbuv = new Dictionary<int, int>();                               //node u's preferred neighbor voor v
         static public Dictionary<Tuple<int, int>, int> Ndisuwv = new Dictionary<Tuple<int, int>, int>();    //node u's kennis over w's afstand tot v
         static public int N = 20;
+        static public object NLocker = new object();
 
         static void Main(string[] args)
         {
@@ -86,12 +87,9 @@ namespace MultiClientServer
             int afstandvoor = readDuv(v);
             bool containsbuur = Nbuv.ContainsKey(v);
             int prefbuurvoor = 0;
-            Console.WriteLine("RECOMPUTE NAAR: " + v);
-            Console.WriteLine("afstand voor: " + afstandvoor);
             if (containsbuur)
             {
                 prefbuurvoor = readNbuv(v);
-              //  Console.WriteLine("Contains buur");
             }
 
             addOrSetDuv(v, N);
@@ -100,13 +98,11 @@ namespace MultiClientServer
             {
                 addOrSetDuv(v, 0);
                 addOrSetNbuv(v, MijnPoort);
-               // Console.WriteLine("Is mijn poort");
             }
             else if (Buren.ContainsKey(v))           // als v in je burenlijst zit
             {
                 addOrSetDuv(v, 1);
                 addOrSetNbuv(v, v);
-               // Console.WriteLine("Contains key");
             }
             else                                    //en anders: kijken wie je preferred neighbour is
             {
@@ -115,34 +111,27 @@ namespace MultiClientServer
                 {
                     foreach (Tuple<int, int> tuple in Ndisuwv.Keys)
                     {
-                        Console.WriteLine("test van " + tuple.Item1 + "naar: " + tuple.Item2);
                         if (tuple.Item2 == v)    //deze buur (Item1) heeft een afstand naar v
                         {
-                            Console.WriteLine("jaaaaaa");
-                            if (Ndisuwv[tuple] < readDuv(v) && Ndisuwv[tuple] < 20)
+                            if (Ndisuwv[tuple] < readDuv(v) && Ndisuwv[tuple] < N)
                             {
-                                Console.WriteLine("updaten");
                                 addOrSetDuv(v, Ndisuwv[tuple] + 1);
                                 addOrSetNbuv(v, tuple.Item1);
                             }
                         }
                     }
                 }
-                Console.WriteLine("JA?");
             }
 
             if (afstandvoor != readDuv(v))
             {
                 Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
-                Console.WriteLine("VERSTUREN NAAR BUREN");
                 updateburen(v);
             }
             else if (containsbuur == false || prefbuurvoor != readNbuv(v))
             {
                 Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
             }
-
-            Console.WriteLine("JA2?");
         }
 
         static public void ReadInput()
@@ -189,7 +178,10 @@ namespace MultiClientServer
                     }
                     else
                     {
-                        Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
+                        if (dist != N)
+                        {
+                            Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
+                        }
                     }
                 }
             }
@@ -203,9 +195,13 @@ namespace MultiClientServer
             int nbuv;
             lock(Buren)
             {
-                if (Buren.TryGetValue(port, out verbinding))
+              //  if (Buren.TryGetValue(port, out verbinding))
+               // {
+                //    verbinding.SendMessage("B " + input[1] + " " + input[2]);
+                //}
+                if (readDuv(port) == N)
                 {
-                    verbinding.SendMessage("B " + input[1] + " " + input[2]);
+                    Console.WriteLine("Onbereikbaar: " + port);
                 }
                 else if (Nbuv.TryGetValue(port, out nbuv))
                 {
@@ -258,30 +254,18 @@ namespace MultiClientServer
                         {
                             if (entry.Value == poort)    //deze buur is net gedelete
                             {
-                                veranderd.Add(entry.Key); //hier ging hij heen    
-                                Console.WriteLine("een");
+                                veranderd.Add(entry.Key); //hier ging hij heen
                                 addOrSetDuv(entry.Key, N);
-                                Console.WriteLine("twee");
-                                //Recompute(entry.Key);
-                                Console.WriteLine("drie");
                             }
                         }
 
                         foreach (int pref in veranderd)
                         {
                             Recompute(pref);
-                            Console.WriteLine("vier");
                         }
                     }
 
-
                     Recompute(poort);           //recompute!
-                   
-
-                   // foreach (int v in veranderd)
-                    //{
-                    //    Recompute(v);
-                    //}
                 }
                 else
                 {
@@ -332,6 +316,10 @@ namespace MultiClientServer
                 else
                 {
                     Duv.Add(poort, afstand);
+                    lock (NLocker)
+                    {
+                      // N = 5 + Duv.Count();
+                    }
                 }    
             }
         }

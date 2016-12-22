@@ -51,8 +51,7 @@ namespace MultiClientServer
                     string bericht = "mydist " + MijnPoort + " " + v + " " + Duv[v];
                     buur.SendMessage(bericht);
                 }
-            }
-            
+            }  
         }
 
         static void init()
@@ -195,22 +194,25 @@ namespace MultiClientServer
             int nbuv;
             lock(Buren)
             {
-              //  if (Buren.TryGetValue(port, out verbinding))
-               // {
+                //  if (Buren.TryGetValue(port, out verbinding))
+                // {
                 //    verbinding.SendMessage("B " + input[1] + " " + input[2]);
                 //}
-                if (readDuv(port) == N)
+                lock (Nbuv)
                 {
-                    Console.WriteLine("Onbereikbaar: " + port);
-                }
-                else if (Nbuv.TryGetValue(port, out nbuv))
-                {
-                    verbinding = Buren[nbuv];
-                    verbinding.SendMessage("B " + input[1] + " " + input[2]);
-                }
-                else
-                {
-                    Console.WriteLine("Poort " + port + " is niet bekend");
+                    if (readDuv(port) == N)
+                    {
+                        Console.WriteLine("Onbereikbaar: " + port);
+                    }
+                    else if (Nbuv.TryGetValue(port, out nbuv))
+                    {
+                        verbinding = Buren[nbuv];
+                        verbinding.SendMessage("B " + input[1] + " " + input[2]);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Poort " + port + " is niet bekend");
+                    }
                 }
             }
             
@@ -223,7 +225,7 @@ namespace MultiClientServer
             {
                 if (!Buren.ContainsKey(poort))
                     {
-                        addBuren(poort, new Connection(poort));
+                        Buren.Add(poort, new Connection(poort));
                         Recompute(poort);               //recompute!
                     }
             }

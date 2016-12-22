@@ -39,7 +39,11 @@ namespace MultiClientServer
 
                     Program.addBuren(zijnPoort, new Connection(clientIn, clientOut));   // Zet de nieuwe verbinding in de verbindingslijst
                     Program.addOrSetNbuv(zijnPoort, zijnPoort);
-                    Program.Recompute(zijnPoort);
+
+                    lock (Program.Buren)
+                    {
+                        Program.Recompute(zijnPoort);
+                    }
                 }
                 catch { Thread.Sleep(100); }
             }

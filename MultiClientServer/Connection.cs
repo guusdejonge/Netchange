@@ -62,7 +62,7 @@ namespace MultiClientServer
                         case "mydist":          //een andere buurt stuurt jou zijn nieuw afstand naar een v
                             inputMyDist(input);
                             break;
-                        case "B":                //alle andere printen
+                        case "B":               //alle andere printen
                             inputB(input);
                             break;
                     }  
@@ -84,7 +84,7 @@ namespace MultiClientServer
             }
             else
             {
-                Console.WriteLine("Bericht voor " + input[1] + " doorgestuurd naar " + Program.Nbuv[int.Parse(input[1])]);
+                Console.WriteLine("Bericht voor " + input[1] + " doorgestuurd naar " + Program.readNbuv(int.Parse(input[1])));
                 Program.inputB(input);
             }
 
@@ -114,14 +114,12 @@ namespace MultiClientServer
                 }
             }
             
-
             Program.addOrSetNdisuwv(uv, d);         //toevoegen of wijzigen nieuwe d
             
             lock(Program.Buren)
             {
                 Program.Recompute(v);       //en recompute
             }
-            
         }
     }
 }

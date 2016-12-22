@@ -73,63 +73,49 @@ namespace MultiClientServer
 
         static void updateburen(int v)    //stuur je nieuwe distance naar v naar alle buren NOTE: alleen gelockt anroepen
         {
-            lock (Duv)
-            {
-                string bericht = "mydist " + MijnPoort + " " + v + " " + Duv[v];    //dus: "mydist mijnpoort anderepoort afstand"
+            string bericht = "mydist " + MijnPoort + " " + v + " " + readDuv(v);    //dus: "mydist mijnpoort anderepoort afstand"
 
-                foreach (Connection buur in Buren.Values)
-                {
-                    buur.SendMessage(bericht);
-                }
+            foreach (Connection buur in Buren.Values)
+            {
+                buur.SendMessage(bericht);
             }
         }
         
         static public void Recompute(int v) //alleen als buren gelockt is
         {
-            int afstandvoor;
+            int afstandvoor = readDuv(v);
 
-            lock (Duv)
+            if (v == MijnPoort)                     //als je v zelf bent
             {
-                afstandvoor = Duv[v];
+                addOrSetDuv(v, 0);
+                addOrSetNbuv(v, MijnPoort);
             }
-
-
-                if (v == MijnPoort)                     //als je v zelf bent
+            else if (Buren.ContainsKey(v))           // als v in je burenlijst zit
+            {
+                addOrSetDuv(v, 1);
+                addOrSetNbuv(v, v);
+            }
+            else                                    //en anders: kijken wie je preferred neighbour is
+            {
+                lock(Ndisuwv)
                 {
-                    addOrSetDuv(v, 0);
-                    addOrSetNbuv(v, MijnPoort);
-                }
-                else if (Buren.ContainsKey(v))           // als v in je burenlijst zit
-                {
-                    addOrSetDuv(v, 1);
-                    addOrSetNbuv(v, v);
-                }
-                else                                    //en anders: kijken wie je preferred neighbour is
-                {
-                    lock(Ndisuwv)
+                    foreach (Tuple<int, int> tuple in Ndisuwv.Keys)
                     {
-                        foreach (Tuple<int, int> tuple in Ndisuwv.Keys)
+                        if (tuple.Item2 == v)    //deze buur (Item1) heeft een afstand naar v
                         {
-                            if (tuple.Item2 == v)    //deze buur (Item1) heeft een afstand naar v
+                            if (Ndisuwv[tuple] < readDuv(v) && Ndisuwv[tuple] < 20)
                             {
-                                if (Ndisuwv[tuple] < Duv[v] && Ndisuwv[tuple] < 20)
-                                {
-                                    addOrSetDuv(v, Ndisuwv[tuple] + 1);
-                                    addOrSetNbuv(v, tuple.Item1);
-                                }
+                                addOrSetDuv(v, Ndisuwv[tuple] + 1);
+                                addOrSetNbuv(v, tuple.Item1);
                             }
                         }
                     }
-                
-
+                }
             }
 
-            if (afstandvoor != Duv[v])
+            if (afstandvoor != readDuv(v))
             {
-             
                     updateburen(v);
-                
-
             }
         }
 
@@ -166,20 +152,17 @@ namespace MultiClientServer
         {
             lock(Nbuv)
             {
-                lock(Duv)
+                foreach (int port in Nbuv.Keys)
                 {
-                    foreach (int port in Nbuv.Keys)
+                    int dist = readDuv(port);
+                    int neigh = Nbuv[port];
+                    if (neigh == MijnPoort)
                     {
-                        int dist = Duv[port];
-                        int neigh = Nbuv[port];
-                        if (neigh == MijnPoort)
-                        {
-                            Console.WriteLine(String.Format("{0} {1} local", port, dist));
-                        }
-                        else
-                        {
-                            Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
-                        }
+                        Console.WriteLine(String.Format("{0} {1} local", port, dist));
+                    }
+                    else
+                    {
+                        Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
                     }
                 }
             }
@@ -242,7 +225,6 @@ namespace MultiClientServer
                         }
                     }
 
-
                     Recompute(poort);           //recompute!
                     foreach(int v in veranderd)
                     {
@@ -280,6 +262,14 @@ namespace MultiClientServer
             }
         }
 
+        static public Connection readBuren(int poort)
+        {
+            lock (Buren)
+            {
+                return Buren[poort];
+            }
+        }
+
         static public void addOrSetDuv(int poort, int afstand)
         {
             lock (Duv)
@@ -292,6 +282,14 @@ namespace MultiClientServer
                 {
                     Duv.Add(poort, afstand);
                 }    
+            }
+        }
+
+        static public int readDuv(int poort)
+        {
+            lock (Duv)
+            {
+                return Duv[poort];
             }
         }
 
@@ -310,7 +308,15 @@ namespace MultiClientServer
             }
         }
 
-        static public void addOrSetNdisuvw(Tuple<int, int> tuple, int afstand)
+        static public int readNbuv(int poort)
+        {
+            lock (Nbuv)
+            {
+                return Nbuv[poort];
+            }
+        }
+
+        static public void addOrSetNdisuwv(Tuple<int, int> tuple, int afstand)
         {
             lock (Ndisuwv)
             {
@@ -322,6 +328,14 @@ namespace MultiClientServer
                 {
                     Ndisuwv.Add(tuple, afstand);
                 }
+            }
+        }
+
+        static public int readNdisuwv(Tuple<int, int> tuple)
+        {
+            lock (Ndisuwv)
+            {
+                return Ndisuwv[tuple];
             }
         }
     }

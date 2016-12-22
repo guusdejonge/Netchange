@@ -125,7 +125,7 @@ namespace MultiClientServer
             }
             
 
-            Program.addOrSetNdisuvw(uv, d);         //toevoegen of wijzigen nieuwe d
+            Program.addOrSetNdisuwv(uv, d);         //toevoegen of wijzigen nieuwe d
             
             lock(Program.Buren)
             {

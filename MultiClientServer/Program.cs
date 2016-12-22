@@ -207,11 +207,14 @@ namespace MultiClientServer
         static void inputC(string[] input)  //maak connectie (input = C poortnummer)
         {
             int poort = int.Parse(input[1]);
-            addBuren(poort, new Connection(poort));
-            lock (Buren){
-                Recompute(poort);               //recompute!
+            lock (Buren)
+            {
+                if (!Buren.ContainsKey(poort))
+                    {
+                        addBuren(poort, new Connection(poort));
+                        Recompute(poort);               //recompute!
+                    }
             }
-            
         }
 
         static void inputD(string[] input)  //delete buur (input = D poortnummer)

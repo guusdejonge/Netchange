@@ -84,6 +84,12 @@ namespace MultiClientServer
         static public void Recompute(int v) //alleen als buren gelockt is
         {
             int afstandvoor = readDuv(v);
+            bool containsbuur = Nbuv.ContainsKey(v);
+            int prefbuurvoor = 0;
+            if (containsbuur)
+            {
+                prefbuurvoor = readNbuv(v);
+            }
 
             if (v == MijnPoort)                     //als je v zelf bent
             {
@@ -115,7 +121,12 @@ namespace MultiClientServer
 
             if (afstandvoor != readDuv(v))
             {
-                    updateburen(v);
+                Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v)); 
+                updateburen(v);
+            }
+            else if (containsbuur == false || prefbuurvoor != readNbuv(v))
+            {
+                Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
             }
         }
 
@@ -169,15 +180,21 @@ namespace MultiClientServer
             
         }
 
-        static void inputB(string[] input)  //stuur bericht (input = B poortnummer bericht)
+        static public void inputB(string[] input)  //stuur bericht (input = B poortnummer bericht)
         {
             int port = int.Parse(input[1]);
             Connection verbinding;
+            int nbuv;
             lock(Buren)
             {
                 if (Buren.TryGetValue(port, out verbinding))
                 {
-                    verbinding.SendMessage(input[2]);
+                    verbinding.SendMessage("B " + input[1] + " " + input[2]);
+                }
+                else if (Nbuv.TryGetValue(port, out nbuv))
+                {
+                    verbinding = Buren[nbuv];
+                    verbinding.SendMessage("B " + input[1] + " " + input[2]);
                 }
                 else
                 {

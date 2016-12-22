@@ -64,6 +64,9 @@ namespace MultiClientServer
                         case "mydist":          //een andere buurt stuurt jou zijn nieuw afstand naar een v
                             inputMyDist(input);
                             break;
+                        case "B":                //alle andere printen
+                            inputB(input);
+                            break;
                     }  
                 }
             }
@@ -75,7 +78,20 @@ namespace MultiClientServer
             Write.WriteLine(message);
         }
 
-        void inputD(string[] input)
+        void inputB(string[] input)
+        {
+            if (int.Parse(input[1]) == Program.MijnPoort)
+            {
+                Console.WriteLine(input[2]);
+            }
+            else
+            {
+                Console.WriteLine("Bericht voor " + input[1] + " doorgestuurd naar " + Program.Nbuv[int.Parse(input[1])]);
+                Program.inputB(input);
+            }
+
+        }
+            void inputD(string[] input)
         {
             int poort = int.Parse(input[1]);
             Console.WriteLine("delete: " + poort);

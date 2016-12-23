@@ -7,22 +7,24 @@ namespace MultiClientServer
 {
     public class InputHandler
     {
-        public virtual void C()
+        public virtual void C(string[] input)
         {
 
         }
 
-        public virtual void D()
+        public virtual void D(string[] input, bool sendMessage)
         {
 
         }
 
-        public virtual void B()
+        public virtual void B(string[] input)
         {
 
         }
 
-        public virtual void myDist()
+        public virtual void R() { }
+
+        public virtual void myDist(string[] input)
         {
 
         }

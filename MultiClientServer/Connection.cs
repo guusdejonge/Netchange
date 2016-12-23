@@ -14,9 +14,12 @@ namespace MultiClientServer
         public StreamReader Read;
         public StreamWriter Write;
 
+        InputHandler inputHandler;
+
         // Connection heeft 2 constructoren: deze constructor wordt gebruikt als wij CLIENT worden bij een andere SERVER
         public Connection(int port)
         {
+            inputHandler = new ConnectionInputHandler();
             TcpClient client = new TcpClient("localhost", port);
             Read = new StreamReader(client.GetStream());
             Write = new StreamWriter(client.GetStream());
@@ -34,6 +37,7 @@ namespace MultiClientServer
         // Deze constructor wordt gebruikt als wij SERVER zijn en een CLIENT maakt met ons verbinding
         public Connection(StreamReader read, StreamWriter write)
         {
+            inputHandler = new ConnectionInputHandler();
             Read = read; Write = write;
 
             // Start het reader-loopje
@@ -57,13 +61,13 @@ namespace MultiClientServer
                     switch (inputSwitch)
                     {
                         case "D":               //de buur is gedelete (aan de andere kant is D .... ingevoerd)
-                            inputD(input);
+                            inputHandler.D(input,false);
                             break;
                         case "mydist":          //een andere buurt stuurt jou zijn nieuw afstand naar een v
-                            inputMyDist(input);
+                            inputHandler.myDist(input);
                             break;
                         case "B":               //alle andere printen
-                            inputB(input);
+                            inputHandler.B(input);
                             break;
                     }  
                 }
@@ -76,50 +80,5 @@ namespace MultiClientServer
             Write.WriteLine(message);
         }
 
-        void inputB(string[] input)
-        {
-            if (int.Parse(input[1]) == Program.MijnPoort)
-            {
-                Console.WriteLine(input[2]);
-            }
-            else
-            {
-                Console.WriteLine("Bericht voor " + input[1] + " doorgestuurd naar " + Program.readNbuv(int.Parse(input[1])));
-                Program.inputB(input);
-            }
-
-        }
-            void inputD(string[] input)
-        {
-            Program.inputD(input, false);
-        }
-
-        void inputMyDist(string[] input)        //input: "mydist u v d"
-        {
-            int u = int.Parse(input[1]);    //de buur die dit stuurt
-            int v = int.Parse(input[2]);    //de node waarnaar zijn afstand is veranderd
-            int d = int.Parse(input[3]);    //zijn nieuwe afstand daarnaartoe
-
-            Tuple<int, int> uv = new Tuple<int, int>(u, v);
-            
-            lock(Program.Duv)
-            {
-                if (!Program.Duv.Keys.Contains(v))
-                {
-                    Program.Duv.Add(v, Program.N + 1);          //nu een +1, kan later ook IN de recompute
-                    lock (Program.NLocker)
-                    {
-                      // Program.N = 5 + Program.Duv.Count();
-                    }
-                }
-            }
-            
-            Program.addOrSetNdisuwv(uv, d);         //toevoegen of wijzigen nieuwe d
-            
-            lock(Program.Buren)
-            {
-                Program.Recompute(v);       //en recompute
-            }
-        }
     }
 }

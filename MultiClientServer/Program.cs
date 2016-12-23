@@ -15,6 +15,7 @@ namespace MultiClientServer
         static public Dictionary<Tuple<int, int>, int> Ndisuwv = new Dictionary<Tuple<int, int>, int>();    //node u's kennis over w's afstand tot v
         static public int N = 20;
         static public object NLocker = new object();
+        static InputHandler inputHandler;
 
         static void Main(string[] args)
         {
@@ -38,6 +39,8 @@ namespace MultiClientServer
             }
 
             catch { Thread.Sleep(10); }
+            inputHandler = new ProgramInputHandler();
+
             init();
             ReadInput();
         }
@@ -146,17 +149,16 @@ namespace MultiClientServer
                     switch (inputSwitch)
                     {
                         case "R":
-                            inputR();
+                            inputHandler.R();
                             break;
                         case "B":
-                            inputB(input);
+                            inputHandler.B(input);
                             break;
                         case "C":
-                            inputC(input);
+                            inputHandler.C(input);
                             break;
                         case "D":
-
-                            inputD(input, true);
+                            inputHandler.D(input, true);
                             break;
                     }
                 }
@@ -164,131 +166,7 @@ namespace MultiClientServer
             catch { } // Verbinding is kennelijk verbroken
         }
 
-        static void inputR()    //laat routingtable zien
-        {
-            lock(Nbuv)
-            {
-                foreach (int port in Nbuv.Keys)
-                {
-                    int dist = readDuv(port);
-                    int neigh = Nbuv[port];
-                    if (neigh == MijnPoort)
-                    {
-                        Console.WriteLine(String.Format("{0} {1} local", port, dist));
-                    }
-                    else
-                    {
-                        if (dist != N)
-                        {
-                            Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
-                        }
-                    }
-                }
-            }
-            
-        }
-
-        static public void inputB(string[] input)  //stuur bericht (input = B poortnummer bericht)
-        {
-            int port = int.Parse(input[1]);
-            Connection verbinding;
-            int nbuv;
-            lock(Buren)
-            {
-                //  if (Buren.TryGetValue(port, out verbinding))
-                // {
-                //    verbinding.SendMessage("B " + input[1] + " " + input[2]);
-                //}
-                lock (Nbuv)
-                {
-                    if (readDuv(port) == N)
-                    {
-                        Console.WriteLine("Onbereikbaar: " + port);
-                    }
-                    else if (Nbuv.TryGetValue(port, out nbuv))
-                    {
-                        verbinding = Buren[nbuv];
-                        verbinding.SendMessage("B " + input[1] + " " + input[2]);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Poort " + port + " is niet bekend");
-                    }
-                }
-            }
-            
-        }
-
-        static void inputC(string[] input)  //maak connectie (input = C poortnummer)
-        {
-            int poort = int.Parse(input[1]);
-            lock (Buren)
-            {
-                if (!Buren.ContainsKey(poort))
-                    {
-                        Buren.Add(poort, new Connection(poort));
-                        addOrSetNbuv(poort, poort);
-                        addOrSetDuv(poort, 21);
-                        Recompute(poort);
-                    // Console.WriteLine("hoi1");
-                    // Recompute(poort);               //recompute!
-
-                }
-            }
-
-            lock(Buren)
-            {
-                Recompute(poort);
-            }
-         //   Console.WriteLine("hoi2");
-        }
-
-        static public void inputD(string[] input, bool sendmessage)  //delete buur (input = D poortnummer)
-        {
-            int poort = int.Parse(input[1]);
-            Connection verbinding;
-            lock(Buren)
-            {
-                if (Buren.TryGetValue(poort, out verbinding))
-                {
-                    if (sendmessage)
-                    {
-                        verbinding.SendMessage("D " + Convert.ToString(MijnPoort));
-                    }
-
-                    removeNdisuwv(poort);
-                    
-                    List<int> veranderd = new List<int>();
-                    Buren.Remove(poort);
-
-                    lock (Nbuv)
-                    {
-                        foreach (KeyValuePair<int, int> entry in Nbuv)
-                        {
-                            if (entry.Value == poort)    //deze buur is net gedelete
-                            {
-                                veranderd.Add(entry.Key); //hier ging hij heen
-                            }
-                        }
-
-                        foreach (int pref in veranderd)
-                        {
-                            Recompute(pref);
-                        }
-                    }
-
-                    
-                    Recompute(poort);           //recompute!
-                }
-                else
-                {
-                    Console.WriteLine("Poort " + poort + " is niet bekend");
-                }
-            }
-
-            
-        }
-
+        
         static public void addBuren(int poort, Connection verbinding)
         {
             lock (Buren)

@@ -37,7 +37,7 @@ namespace MultiClientServer
                 }
             }
 
-            catch { Thread.Sleep(100); }
+            catch { Thread.Sleep(10); }
             init();
             ReadInput();
         }
@@ -112,7 +112,7 @@ namespace MultiClientServer
                     {
                         if (tuple.Item2 == v)    //deze buur (Item1) heeft een afstand naar v
                         {
-                            if (Ndisuwv[tuple] < readDuv(v) && Ndisuwv[tuple] < N)
+                            if (Ndisuwv[tuple] < readDuv(v) && Ndisuwv[tuple] <= N)
                             {
                                 addOrSetDuv(v, Ndisuwv[tuple] + 1);
                                 addOrSetNbuv(v, tuple.Item1);
@@ -129,6 +129,7 @@ namespace MultiClientServer
             }
             else if (containsbuur == false || prefbuurvoor != readNbuv(v))
             {
+                updateburen(v);
                 Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
             }
         }
@@ -226,9 +227,20 @@ namespace MultiClientServer
                 if (!Buren.ContainsKey(poort))
                     {
                         Buren.Add(poort, new Connection(poort));
-                        Recompute(poort);               //recompute!
-                    }
+                        addOrSetNbuv(poort, poort);
+                        addOrSetDuv(poort, 21);
+                        Recompute(poort);
+                    // Console.WriteLine("hoi1");
+                    // Recompute(poort);               //recompute!
+
+                }
             }
+
+            lock(Buren)
+            {
+                Recompute(poort);
+            }
+         //   Console.WriteLine("hoi2");
         }
 
         static public void inputD(string[] input, bool sendmessage)  //delete buur (input = D poortnummer)
@@ -244,12 +256,11 @@ namespace MultiClientServer
                         verbinding.SendMessage("D " + Convert.ToString(MijnPoort));
                     }
 
-                    Buren.Remove(poort);
                     removeNdisuwv(poort);
-                    addOrSetDuv(poort, N);
                     
                     List<int> veranderd = new List<int>();
-                    
+                    Buren.Remove(poort);
+
                     lock (Nbuv)
                     {
                         foreach (KeyValuePair<int, int> entry in Nbuv)
@@ -257,7 +268,6 @@ namespace MultiClientServer
                             if (entry.Value == poort)    //deze buur is net gedelete
                             {
                                 veranderd.Add(entry.Key); //hier ging hij heen
-                                addOrSetDuv(entry.Key, N);
                             }
                         }
 
@@ -267,6 +277,7 @@ namespace MultiClientServer
                         }
                     }
 
+                    
                     Recompute(poort);           //recompute!
                 }
                 else

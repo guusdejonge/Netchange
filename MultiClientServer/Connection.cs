@@ -106,7 +106,7 @@ namespace MultiClientServer
             {
                 if (!Program.Duv.Keys.Contains(v))
                 {
-                    Program.Duv.Add(v, Program.N);
+                    Program.Duv.Add(v, Program.N + 1);          //nu een +1, kan later ook IN de recompute
                     lock (Program.NLocker)
                     {
                       // Program.N = 5 + Program.Duv.Count();

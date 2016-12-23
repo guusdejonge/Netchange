@@ -26,12 +26,11 @@ namespace MultiClientServer
             Write.AutoFlush = true;
 
             // De server kan niet zien van welke poort wij client zijn, dit moeten we apart laten weten
-            Write.WriteLine("Poort: " + Program.MijnPoort);
+            //Write.WriteLine("Poort: " + Program.MijnPoort);
             
             // Start het reader-loopje
             new Thread(ReaderThread).Start();
 
-            Program.SendRoutingTable(this);
         }
 
         // Deze constructor wordt gebruikt als wij SERVER zijn en een CLIENT maakt met ons verbinding
@@ -43,7 +42,6 @@ namespace MultiClientServer
             // Start het reader-loopje
             new Thread(ReaderThread).Start();
 
-            Program.SendRoutingTable(this);
         }
 
         // LET OP: Nadat er verbinding is gelegd, kun je vergeten wie er client/server is (en dat kun je aan het Connection-object dus ook niet zien!)
@@ -55,21 +53,24 @@ namespace MultiClientServer
             {
                 while (true)
                 {
+                    while (Program.initKlaar == false) { }
                     string[] input = Read.ReadLine().Split(' ');
                     string inputSwitch = input[0];
-
-                    switch (inputSwitch)
+                    lock (inputHandler)
                     {
-                        case "D":               //de buur is gedelete (aan de andere kant is D .... ingevoerd)
-                            inputHandler.D(input,false);
-                            break;
-                        case "mydist":          //een andere buurt stuurt jou zijn nieuw afstand naar een v
-                            inputHandler.myDist(input);
-                            break;
-                        case "B":               //alle andere printen
-                            inputHandler.B(input);
-                            break;
-                    }  
+                        switch (inputSwitch)
+                        {
+                            case "D":               //de buur is gedelete (aan de andere kant is D .... ingevoerd)
+                                inputHandler.D(input, false);
+                                break;
+                            case "mydist":          //een andere buurt stuurt jou zijn nieuw afstand naar een v
+                                inputHandler.myDist(input);
+                                break;
+                            case "B":               //alle andere printen
+                                inputHandler.B(input);
+                                break;
+                        }
+                    } 
                 }
             }
             catch { } // Verbinding is kennelijk verbroken
@@ -77,7 +78,9 @@ namespace MultiClientServer
 
         public void SendMessage(string message)
         {
-            Write.WriteLine(message);
+            
+                Write.WriteLine(message);
+            
         }
 
     }

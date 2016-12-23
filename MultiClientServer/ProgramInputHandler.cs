@@ -11,7 +11,7 @@ namespace MultiClientServer
         {
             int port = int.Parse(input[1]);
             Connection verbinding;
-            int nbuv;
+            int? nbuv;
             lock (Program.Buren)
             {
                 //  if (Buren.TryGetValue(port, out verbinding))
@@ -26,7 +26,7 @@ namespace MultiClientServer
                     }
                     else if (Program.Nbuv.TryGetValue(port, out nbuv))
                     {
-                        verbinding = Program.Buren[nbuv];
+                        verbinding = Program.Buren[(int)nbuv];
                         verbinding.SendMessage("B " + input[1] + " " + input[2]);
                     }
                     else
@@ -44,10 +44,13 @@ namespace MultiClientServer
             {
                 if (!Program.Buren.ContainsKey(poort))
                 {
-                    Program.Buren.Add(poort, new Connection(poort));
-                    Program.addOrSetNbuv(poort, poort);
-                    Program.addOrSetDuv(poort, 21);
-                    Program.Recompute(poort);
+                    Connection verbinding = new Connection(poort);
+                    Program.Buren.Add(poort, verbinding);
+                    Program.addOrSetDuv(poort, Program.N);
+                    Program.SendRoutingTable(verbinding);
+                    //Program.addOrSetNbuv(poort, poort);
+                    //Program.addOrSetDuv(poort, 21);
+                    //Program.Recompute(poort);
                     // Console.WriteLine("hoi1");
                     // Recompute(poort);               //recompute!
 
@@ -72,30 +75,41 @@ namespace MultiClientServer
                     {
                         verbinding.SendMessage("D " + Convert.ToString(Program.MijnPoort));
                     }
-
-                    Program.removeNdisuwv(poort);
-
-                    List<int> veranderd = new List<int>();
                     Program.Buren.Remove(poort);
 
-                    lock (Program.Nbuv)
+                    lock (Program.Netwerk)
                     {
-                        foreach (KeyValuePair<int, int> entry in Program.Nbuv)
-                        {
-                            if (entry.Value == poort)    //deze buur is net gedelete
-                            {
-                                veranderd.Add(entry.Key); //hier ging hij heen
-                            }
-                        }
+                        Program.Netwerk.Remove(poort);
 
-                        foreach (int pref in veranderd)
+                        foreach (int v in Program.Netwerk)
                         {
-                            Program.Recompute(pref);
+                            Program.Recompute(v);
                         }
                     }
 
+                //    Program.removeNdisuwv(poort);
 
-                    Program.Recompute(poort);           //recompute!
+                //    List<int> veranderd = new List<int>();
+                //    Program.Buren.Remove(poort);
+
+                //    lock (Program.Nbuv)
+                //    {
+                //        foreach (KeyValuePair<int, int?> entry in Program.Nbuv)
+                //        {
+                //            if (entry.Value == poort)    //deze buur is net gedelete
+                //            {
+                //                veranderd.Add(entry.Key); //hier ging hij heen
+                //            }
+                //        }
+
+                //        foreach (int pref in veranderd)
+                //        {
+                //            Program.Recompute(pref);
+                //        }
+                //    }
+
+
+                //    Program.Recompute(poort);           //recompute!
                 }
                 else
                 {
@@ -111,17 +125,17 @@ namespace MultiClientServer
                 foreach (int port in Program.Nbuv.Keys)
                 {
                     int dist = Program.readDuv(port);
-                    int neigh = Program.Nbuv[port];
+                    int? neigh = Program.Nbuv[port];
                     if (neigh == Program.MijnPoort)
                     {
                         Console.WriteLine(String.Format("{0} {1} local", port, dist));
                     }
                     else
                     {
-                        if (dist != Program.N)
-                        {
+                        //if (dist != Program.N)
+                        //{
                             Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
-                        }
+                        //}
                     }
                 }
             }

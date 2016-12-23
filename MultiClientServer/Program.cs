@@ -9,52 +9,77 @@ namespace MultiClientServer
     class Program
     {
         static public int MijnPoort;
+        static public List<int> Netwerk = new List<int>();
         static public Dictionary<int, Connection> Buren = new Dictionary<int, Connection>();                //lijst buren
         static public Dictionary<int, int> Duv = new Dictionary<int, int>();                                //schatting in u van distance u naar v
-        static public Dictionary<int, int> Nbuv = new Dictionary<int, int>();                               //node u's preferred neighbor voor v
+        static public Dictionary<int, int?> Nbuv = new Dictionary<int, int?>();                               //node u's preferred neighbor voor v
         static public Dictionary<Tuple<int, int>, int> Ndisuwv = new Dictionary<Tuple<int, int>, int>();    //node u's kennis over w's afstand tot v
+
         static public int N = 20;
+        static public int aantalBuren = 0;
+        static public int verwerkteBuren = 0;
+
         static public object NLocker = new object();
+        static public object verwerktLocker = new object();
+
+        static public bool initKlaar = false;
+
         static InputHandler inputHandler;
 
         static void Main(string[] args)
         {
             Console.Title = args[0];
-            int numberOfNeighbors = args.Length;
+            aantalBuren = args.Length - 1;
             MijnPoort = int.Parse(args[0]);
+            addInNetwerk(MijnPoort);
             new Server(MijnPoort);
-
             try
             {
-                for (int i = 1; i < numberOfNeighbors; i++)
+                for (int i = 0; i < aantalBuren; i++)
                 {
-                    int poort = int.Parse(args[i]);
+                    int poort = int.Parse(args[i + 1]);
 
                     if (poort > MijnPoort)
                     {
                         addBuren(poort, new Connection(poort));
+                        addInNetwerk(poort);
+                        lock (verwerktLocker)
+                        {
+                            verwerkteBuren++;
+                        }
                     }
                     else { }
                 }
             }
 
-            catch { Thread.Sleep(10); }
+            catch { Thread.Sleep(50); }
+
+
             inputHandler = new ProgramInputHandler();
 
             init();
+            foreach (Connection verbinding in Buren.Values)
+            {
+                string bericht = "mydist " + MijnPoort + " " + MijnPoort + " " + readDuv(MijnPoort);    //dus: "mydist mijnpoort anderepoort afstand"
+                verbinding.SendMessage(bericht);
+
+            }
+
+            updateburen(MijnPoort);
+
             ReadInput();
         }
 
         static public void SendRoutingTable(Connection buur)
         {
-            lock(Duv)
+            lock (Duv)
             {
                 foreach (int v in Duv.Keys)
                 {
                     string bericht = "mydist " + MijnPoort + " " + v + " " + Duv[v];
                     buur.SendMessage(bericht);
                 }
-            }  
+            }
         }
 
         static void init()
@@ -62,79 +87,161 @@ namespace MultiClientServer
             addOrSetDuv(MijnPoort, 0);
             addOrSetNbuv(MijnPoort, MijnPoort);
 
-            lock(Buren)
+            while (verwerkteBuren != aantalBuren)
             {
+                Thread.Sleep(100);
+            }
+
+            lock (Buren)
+            {
+                updateburen(MijnPoort);
+
                 foreach (int buur in Buren.Keys)
                 {
-                    addOrSetDuv(buur, 1);
-                    addOrSetNbuv(buur, buur);
+                    addOrSetDuv(buur, N);
+                    addOrSetNbuv(buur, null);
+                    addInNetwerk(buur);
+                }
+                foreach (int buur1 in Buren.Keys)
+                {
 
-                    updateburen(buur); //stuur naar alle buren je distance naar deze buur
+
+                    foreach (int buur2 in Buren.Keys)
+                    {
+                        if (buur1 < buur2)
+                        {
+                            Tuple<int, int> tuple = new Tuple<int, int>(buur1, buur2);
+                            addOrSetNdisuwv(tuple, N);
+
+                        }
+                    }
+
+
+
                 }
             }
+
+            initKlaar = true;
+            Console.WriteLine("Init klaar");
         }
 
         static void updateburen(int v)    //stuur je nieuwe distance naar v naar alle buren NOTE: alleen gelockt anroepen
         {
             string bericht = "mydist " + MijnPoort + " " + v + " " + readDuv(v);    //dus: "mydist mijnpoort anderepoort afstand"
 
-            foreach (Connection buur in Buren.Values)
+            foreach (KeyValuePair<int, Connection> buur in Buren)
             {
-                buur.SendMessage(bericht);
+                buur.Value.SendMessage(bericht);
+                Console.WriteLine("Verstuurd " + " " + bericht + " naar" + " " + buur.Key);
+
             }
         }
-        
+
         static public void Recompute(int v) //alleen als buren gelockt is
         {
-            int afstandvoor = readDuv(v);
-            bool containsbuur = Nbuv.ContainsKey(v);
-            int prefbuurvoor = 0;
-            if (containsbuur)
+            Console.WriteLine(MijnPoort + " recompute " + v);
+            if (v == MijnPoort)
             {
-                prefbuurvoor = readNbuv(v);
+                addOrSetDuv(MijnPoort, 0);
+                addOrSetNbuv(MijnPoort, MijnPoort);
             }
+            
+            else
+            {
 
-            addOrSetDuv(v, N);
-
-            if (v == MijnPoort)                     //als je v zelf bent
-            {
-                addOrSetDuv(v, 0);
-                addOrSetNbuv(v, MijnPoort);
-            }
-            else if (Buren.ContainsKey(v))           // als v in je burenlijst zit
-            {
-                addOrSetDuv(v, 1);
-                addOrSetNbuv(v, v);
-            }
-            else                                    //en anders: kijken wie je preferred neighbour is
-            {
-              
+                int afstand = N;
+                int afstandVoor = 21;
+                if (Duv.ContainsKey(v))
+                {
+                    afstandVoor = readDuv(v);
+                }
+                int? prefBuurVoor = null;
                 lock (Ndisuwv)
                 {
-                    foreach (Tuple<int, int> tuple in Ndisuwv.Keys)
+                    foreach (KeyValuePair<Tuple<int, int>, int> tuple in Ndisuwv)
                     {
-                        if (tuple.Item2 == v)    //deze buur (Item1) heeft een afstand naar v
+                        addInNetwerk(tuple.Key.Item1);
+                        addInNetwerk(tuple.Key.Item2);
+
+                        if (tuple.Key.Item2 == v)
                         {
-                            if (Ndisuwv[tuple] < readDuv(v) && Ndisuwv[tuple] <= N)
+                            if (tuple.Value < afstand)
                             {
-                                addOrSetDuv(v, Ndisuwv[tuple] + 1);
-                                addOrSetNbuv(v, tuple.Item1);
+                                afstand = 1 + tuple.Value;
+                                prefBuurVoor = tuple.Key.Item1;
                             }
                         }
                     }
                 }
+                if (afstand < N)
+                {
+                    addOrSetDuv(v, afstand);
+                    addOrSetNbuv(v, prefBuurVoor);
+                }
+                else
+                {
+                    addOrSetDuv(v, N);
+                    addOrSetNbuv(v, null);
+                }
+
+                if (afstand != afstandVoor)
+                {
+                    updateburen(v);
+                }
+
+
+
             }
 
-            if (afstandvoor != readDuv(v))
-            {
-                Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
-                updateburen(v);
-            }
-            else if (containsbuur == false || prefbuurvoor != readNbuv(v))
-            {
-                updateburen(v);
-                Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
-            }
+            //int afstandvoor = readDuv(v);
+            //bool containsbuur = Nbuv.ContainsKey(v);
+            //int prefbuurvoor = 0;
+            //if (containsbuur)
+            //{
+            //    prefbuurvoor = readNbuv(v);
+            //}
+
+            //addOrSetDuv(v, N);
+
+            //if (v == MijnPoort)                     //als je v zelf bent
+            //{
+            //    addOrSetDuv(v, 0);
+            //    addOrSetNbuv(v, MijnPoort);
+            //}
+            //else if (Buren.ContainsKey(v))           // als v in je burenlijst zit
+            //{
+            //    addOrSetDuv(v, 1);
+            //    addOrSetNbuv(v, v);
+            //}
+            //else                                    //en anders: kijken wie je preferred neighbour is
+            //{
+
+            //    lock (Ndisuwv)
+            //    {
+            //        foreach (Tuple<int, int> tuple in Ndisuwv.Keys)
+            //        {
+            //            if (tuple.Item2 == v)    //deze buur (Item1) heeft een afstand naar v
+            //            {
+            //                if (Ndisuwv[tuple] < readDuv(v) && Ndisuwv[tuple] <= N)
+            //                {
+            //                    addOrSetDuv(v, Ndisuwv[tuple] + 1);
+            //                    addOrSetNbuv(v, tuple.Item1);
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+
+            //if (afstandvoor != readDuv(v))
+            //{
+            //    Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
+            //    updateburen(v);
+            //}
+            //else if (containsbuur == false || prefbuurvoor != readNbuv(v))
+            //{
+            //    updateburen(v);
+            //    Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
+            //}
         }
 
         static public void ReadInput()
@@ -146,32 +253,63 @@ namespace MultiClientServer
                     string[] input = Console.ReadLine().Split(' ');
                     string inputSwitch = input[0];
 
-                    switch (inputSwitch)
+                    lock (inputHandler)
                     {
-                        case "R":
-                            inputHandler.R();
-                            break;
-                        case "B":
-                            inputHandler.B(input);
-                            break;
-                        case "C":
-                            inputHandler.C(input);
-                            break;
-                        case "D":
-                            inputHandler.D(input, true);
-                            break;
+                        switch (inputSwitch)
+                        {
+                            case "R":
+                                inputHandler.R();
+                                break;
+                            case "B":
+                                inputHandler.B(input);
+                                break;
+                            case "C":
+                                inputHandler.C(input);
+                                break;
+                            case "D":
+                                inputHandler.D(input, true);
+                                break;
+                        }
                     }
                 }
             }
             catch { } // Verbinding is kennelijk verbroken
         }
 
-        
+
+        static public void addInNetwerk(int poort)
+        {
+            lock (Netwerk)
+            {
+                if (!Netwerk.Contains(poort))
+                {
+                    Netwerk.Add(poort);
+                }
+            }
+        }
+
+        static public void removeUitNetwerk(int poort)
+        {
+            lock (Netwerk)
+            {
+                Netwerk.Remove(poort);
+            }
+        }
+
+
         static public void addBuren(int poort, Connection verbinding)
         {
             lock (Buren)
             {
-                Buren.Add(poort, verbinding);
+                try
+                {
+                    Buren.Add(poort, verbinding);
+                }
+
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
         }
 
@@ -184,7 +322,7 @@ namespace MultiClientServer
                 {
                     Console.WriteLine(buur);
                 }
-                
+
             }
         }
 
@@ -203,15 +341,16 @@ namespace MultiClientServer
                 if (Duv.ContainsKey(poort))
                 {
                     Duv[poort] = afstand;
+                    Console.WriteLine("Aangepast: " + poort + " " + afstand);
                 }
                 else
                 {
                     Duv.Add(poort, afstand);
                     lock (NLocker)
                     {
-                      // N = 5 + Duv.Count();
+                        // N = 5 + Duv.Count();
                     }
-                }    
+                }
             }
         }
 
@@ -223,11 +362,11 @@ namespace MultiClientServer
             }
         }
 
-        static public void addOrSetNbuv(int poort, int prefBuurPoort)
+        static public void addOrSetNbuv(int poort, int? prefBuurPoort)
         {
             lock (Nbuv)
             {
-                if(Nbuv.ContainsKey(poort))
+                if (Nbuv.ContainsKey(poort))
                 {
                     Nbuv[poort] = prefBuurPoort;
                 }
@@ -242,7 +381,7 @@ namespace MultiClientServer
         {
             lock (Nbuv)
             {
-                return Nbuv[poort];
+                return (int)Nbuv[poort];
             }
         }
 
@@ -271,7 +410,7 @@ namespace MultiClientServer
 
         static public void removeNdisuwv(int poort)
         {
-            List<Tuple<int,int>> verwijder = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> verwijder = new List<Tuple<int, int>>();
             lock (Ndisuwv)
             {
                 foreach (Tuple<int, int> tuple in Ndisuwv.Keys)

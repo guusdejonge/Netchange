@@ -34,17 +34,33 @@ namespace MultiClientServer
 
                     // De server weet niet wat de poort is van de client die verbinding maakt, de client geeft dus als onderdeel van het protocol als eerst een bericht met zijn poort
                     int zijnPoort = int.Parse(clientIn.ReadLine().Split()[1]);
-
                     //Console.WriteLine("Client maakt verbinding: " + zijnPoort);
+                    Connection verbinding = new Connection(clientIn, clientOut);
 
-                    Program.addBuren(zijnPoort, new Connection(clientIn, clientOut));   // Zet de nieuwe verbinding in de verbindingslijst
-                    Program.addOrSetNbuv(zijnPoort, zijnPoort);
-                    Program.addOrSetDuv(zijnPoort, 21);
-
-                    lock (Program.Buren)
+                    Program.addBuren(zijnPoort, verbinding);
+                    lock (Program.verwerktLocker)
                     {
-                        Program.Recompute(zijnPoort);
+                        Program.verwerkteBuren++;
                     }
+                    Program.addInNetwerk(zijnPoort);
+
+                    lock (Program.Netwerk)
+                    {
+                        foreach (int poort in Program.Netwerk)
+                        {
+                            Tuple<int, int> tuple = new Tuple<int, int>(zijnPoort, poort);
+                            Program.addOrSetNdisuwv(tuple, Program.N);
+                        }
+                    }
+                    //Program.addBuren(zijnPoort, verbinding);   // Zet de nieuwe verbinding in de verbindingslijst
+                    Program.addOrSetDuv(zijnPoort, Program.N);
+
+                    Program.SendRoutingTable(verbinding);
+
+                    //lock (Program.Buren)
+                    //{
+                    //    Program.Recompute(zijnPoort);
+                    //}
                 }
                 catch { Thread.Sleep(10); }
             }

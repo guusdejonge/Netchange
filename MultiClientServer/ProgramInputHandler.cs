@@ -46,15 +46,17 @@ namespace MultiClientServer
                 {
                     Connection verbinding = new Connection(poort);
                     Program.Buren.Add(poort, verbinding);
-                    Program.addOrSetDuv(poort, Program.N);
-                    lock (Program.Duv)
-                    {
-                        foreach (int bestemming in Program.Duv.Keys)
-                        {
-                            Tuple<int, int> tuple = new Tuple<int, int>(poort, bestemming);
-                            Program.addOrSetNdisuwv(tuple, Program.N);
-                        }
-                    }
+                    Program.addOrSetDuv(poort, 1);
+                    Program.addOrSetNbuv(poort, poort);
+                    Program.updateburen(poort);
+                    // lock (Program.Duv)
+                    // {
+                    //     foreach (int bestemming in Program.Duv.Keys)
+                    //     {
+                    //         Tuple<int, int> tuple = new Tuple<int, int>(poort, bestemming);
+                    //         Program.addOrSetNdisuwv(tuple, Program.N + 1);
+                    //     }
+                    // }
                     Program.SendRoutingTable(poort, verbinding);
 
                     //Program.addOrSetNbuv(poort, poort);

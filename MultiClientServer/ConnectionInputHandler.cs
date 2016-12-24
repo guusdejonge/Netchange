@@ -37,17 +37,18 @@ namespace MultiClientServer
             //Console.WriteLine("Ontvangen " + " " + u + " " + v + " " + d);
             Tuple<int, int> uv = new Tuple<int, int>(u, v);
 
-            //lock (Program.Duv)
-            //{
-            //    if (!Program.Duv.Keys.Contains(v))
-            //    {
-            //        Program.Duv.Add(v, Program.N + 1);          //nu een +1, kan later ook IN de recompute
-            //        lock (Program.NLocker)
-            //        {
-            //            // Program.N = 5 + Program.Duv.Count();
-            //        }
-            //    }
-            //}
+            /*
+            lock (Program.Duv)
+            {
+                if (!Program.Duv.Keys.Contains(v))
+                {
+                    Program.Duv.Add(v, Program.N + 1);          //nu een +1, kan later ook IN de recompute
+                    lock (Program.NLocker)
+                    {
+                        // Program.N = 5 + Program.Duv.Count();
+                    }
+                }
+            }*/
             
             Program.addOrSetNdisuwv(uv, d);         //toevoegen of wijzigen nieuwe d
             lock (Program.Buren)

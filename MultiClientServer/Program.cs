@@ -126,7 +126,7 @@ namespace MultiClientServer
             //Console.WriteLine("Init klaar");
         }
 
-        static void updateburen(int v)    //stuur je nieuwe distance naar v naar alle buren NOTE: alleen gelockt anroepen
+        static public void updateburen(int v)    //stuur je nieuwe distance naar v naar alle buren NOTE: alleen gelockt anroepen
         {
             string bericht = "mydist " + MijnPoort + " " + v + " " + readDuv(v);    //dus: "mydist mijnpoort anderepoort afstand"
 
@@ -151,7 +151,6 @@ namespace MultiClientServer
             
             else
             {
-
                 int afstand = N;
                 int afstandVoor = 21;
                 if (Duv.ContainsKey(v))
@@ -163,8 +162,6 @@ namespace MultiClientServer
                 {
                     foreach (KeyValuePair<Tuple<int, int>, int> tuple in Ndisuwv)
                     {
-             
-
                         if (tuple.Key.Item2 == v)
                         {
                             if (tuple.Value < afstand)
@@ -190,9 +187,6 @@ namespace MultiClientServer
                 {
                     updateburen(v);
                 }
-
-
-
             }
 
             //int afstandvoor = readDuv(v);
@@ -278,12 +272,6 @@ namespace MultiClientServer
             catch { } // Verbinding is kennelijk verbroken
         }
 
-
-        
-
-        
-
-
         static public void addBuren(int poort, Connection verbinding)
         {
             lock (Buren)
@@ -309,7 +297,6 @@ namespace MultiClientServer
                 {
                     Console.WriteLine(buur);
                 }
-
             }
         }
 

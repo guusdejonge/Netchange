@@ -45,16 +45,18 @@ namespace MultiClientServer
 
                     
 
-                    lock (Program.Duv)
-                    {
-                        foreach(int bestemming in Program.Duv.Keys)
-                        {
-                            Tuple<int, int> tuple = new Tuple<int, int>(zijnPoort, bestemming);
-                            Program.addOrSetNdisuwv(tuple, Program.N);
-                        }
-                    }
+                    //lock (Program.Duv)
+                    //{
+                     //   foreach(int bestemming in Program.Duv.Keys)
+                    //    {
+                    //        Tuple<int, int> tuple = new Tuple<int, int>(zijnPoort, bestemming);
+                    //        Program.addOrSetNdisuwv(tuple, Program.N + 1);
+                    //    }
+                    //}
                     //Program.addBuren(zijnPoort, verbinding);   // Zet de nieuwe verbinding in de verbindingslijst
-                    Program.addOrSetDuv(zijnPoort, Program.N);
+                    Program.addOrSetDuv(zijnPoort, 1);
+                    Program.addOrSetNbuv(zijnPoort, zijnPoort);
+                    Program.updateburen(zijnPoort);
                     Console.WriteLine(zijnPoort + " is nu mijn buur");
 
                     lock (Program.Buren)
@@ -66,8 +68,6 @@ namespace MultiClientServer
                     }
 
                     Program.SendRoutingTable(zijnPoort, verbinding);
-
-                   
                 }
                 catch { Thread.Sleep(10); }
             }

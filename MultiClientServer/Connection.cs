@@ -78,9 +78,7 @@ namespace MultiClientServer
 
         public void SendMessage(string message)
         {
-            
                 Write.WriteLine(message);
-            
         }
 
     }

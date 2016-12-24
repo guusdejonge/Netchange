@@ -20,10 +20,12 @@ namespace MultiClientServer
                 //}
                 lock (Program.Nbuv)
                 {
+                    //Als poort onbereikbaar is geworden door partitie
                     if (Program.readDuv(port) == Program.N)
                     {
                         Console.WriteLine("Onbereikbaar: " + port);
                     }
+                    //Als de poort bekend is en in Nbuv staat
                     else if (Program.Nbuv.TryGetValue(port, out nbuv))
                     {
                         verbinding = Program.Buren[(int)nbuv];
@@ -42,6 +44,7 @@ namespace MultiClientServer
             int poort = int.Parse(input[1]);
             lock (Program.Buren)
             {
+                //Als poort nog niet is toegevoegd
                 if (!Program.Buren.ContainsKey(poort))
                 {
                     Connection verbinding = new Connection(poort);
@@ -84,13 +87,12 @@ namespace MultiClientServer
             Connection verbinding;
             lock (Program.Buren)
             {
-
+                //Als poort inderdaad een buur is
                 if (Program.Buren.TryGetValue(poort, out verbinding))
                 {
-
+                    //Als wij de delete initiëren moeten we de andere dat laten weten
                     if (sendMessage)
                     {
-
                         verbinding.SendMessage("D " + Convert.ToString(Program.MijnPoort));
                     }
                     Program.removeNdisuwv(poort);
@@ -102,10 +104,12 @@ namespace MultiClientServer
                     {
                         foreach (KeyValuePair<int, int?> tuple in Program.Nbuv)
                         {
+                            //Als de poort een preferred neighbor was voor de Key, dan Key toevoegen aan veranderd
                             if (tuple.Value == poort) { veranderd.Add(tuple.Key); }
                         }
                     }
 
+                    //Alle bestemmingen waarvan de preferred neigbor is verwijderd, recomputen.
                     lock (Program.recomputeLocker)
                     {
                         foreach (int bestemming in veranderd)
@@ -163,6 +167,7 @@ namespace MultiClientServer
                     }
                     else
                     {
+                        //Als de poort bereikbaar is
                         if (dist != Program.N)
                         {
                             Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));

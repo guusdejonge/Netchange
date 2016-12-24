@@ -26,7 +26,7 @@ namespace MultiClientServer
             Write.AutoFlush = true;
 
             // De server kan niet zien van welke poort wij client zijn, dit moeten we apart laten weten
-            //Write.WriteLine("Poort: " + Program.MijnPoort);
+            Write.WriteLine("Poort: " + Program.MijnPoort);
             
             // Start het reader-loopje
             new Thread(ReaderThread).Start();
@@ -53,7 +53,9 @@ namespace MultiClientServer
             {
                 while (true)
                 {
+                    //Niet al dingen gaan afhandelen voordat init klaar is
                     while (Program.initKlaar == false) { }
+
                     string[] input = Read.ReadLine().Split(' ');
                     string inputSwitch = input[0];
                     lock (inputHandler)

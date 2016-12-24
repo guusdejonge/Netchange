@@ -98,6 +98,8 @@ namespace MultiClientServer
                     Program.removeNdisuwv(poort);
                     Program.Buren.Remove(poort);
 
+                    Console.WriteLine("Verbroken: " + poort);
+
                     List<int> veranderd = new List<int>();
 
                     lock (Program.Nbuv)

@@ -34,7 +34,7 @@ namespace MultiClientServer
             int u = int.Parse(input[1]);    //de buur die dit stuurt
             int v = int.Parse(input[2]);    //de node waarnaar zijn afstand is veranderd
             int d = int.Parse(input[3]);    //zijn nieuwe afstand daarnaartoe
-            Console.WriteLine("Ontvangen " + " " + u + " " + v + " " + d);
+            //Console.WriteLine("Ontvangen " + " " + u + " " + v + " " + d);
             Tuple<int, int> uv = new Tuple<int, int>(u, v);
 
             //lock (Program.Duv)
@@ -52,7 +52,10 @@ namespace MultiClientServer
             Program.addOrSetNdisuwv(uv, d);         //toevoegen of wijzigen nieuwe d
             lock (Program.Buren)
             {
-                Program.Recompute(v);       //en recompute
+                lock (Program.recomputeLocker)
+                {
+                    Program.Recompute(v);       //en recompute
+                }
             }
         }
     }

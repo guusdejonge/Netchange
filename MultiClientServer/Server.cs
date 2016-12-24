@@ -42,25 +42,32 @@ namespace MultiClientServer
                     {
                         Program.verwerkteBuren++;
                     }
-                    Program.addInNetwerk(zijnPoort);
 
-                    lock (Program.Netwerk)
+                    
+
+                    lock (Program.Duv)
                     {
-                        foreach (int poort in Program.Netwerk)
+                        foreach(int bestemming in Program.Duv.Keys)
                         {
-                            Tuple<int, int> tuple = new Tuple<int, int>(zijnPoort, poort);
+                            Tuple<int, int> tuple = new Tuple<int, int>(zijnPoort, bestemming);
                             Program.addOrSetNdisuwv(tuple, Program.N);
                         }
                     }
                     //Program.addBuren(zijnPoort, verbinding);   // Zet de nieuwe verbinding in de verbindingslijst
                     Program.addOrSetDuv(zijnPoort, Program.N);
+                    Console.WriteLine(zijnPoort + " is nu mijn buur");
 
-                    Program.SendRoutingTable(verbinding);
+                    lock (Program.Buren)
+                    {
+                        lock (Program.recomputeLocker)
+                        {
+                            Program.Recompute(zijnPoort);
+                        }
+                    }
 
-                    //lock (Program.Buren)
-                    //{
-                    //    Program.Recompute(zijnPoort);
-                    //}
+                    Program.SendRoutingTable(zijnPoort, verbinding);
+
+                   
                 }
                 catch { Thread.Sleep(10); }
             }

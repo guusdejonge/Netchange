@@ -47,7 +47,16 @@ namespace MultiClientServer
                     Connection verbinding = new Connection(poort);
                     Program.Buren.Add(poort, verbinding);
                     Program.addOrSetDuv(poort, Program.N);
-                    Program.SendRoutingTable(verbinding);
+                    lock (Program.Duv)
+                    {
+                        foreach (int bestemming in Program.Duv.Keys)
+                        {
+                            Tuple<int, int> tuple = new Tuple<int, int>(poort, bestemming);
+                            Program.addOrSetNdisuwv(tuple, Program.N);
+                        }
+                    }
+                    Program.SendRoutingTable(poort, verbinding);
+
                     //Program.addOrSetNbuv(poort, poort);
                     //Program.addOrSetDuv(poort, 21);
                     //Program.Recompute(poort);
@@ -59,57 +68,75 @@ namespace MultiClientServer
 
             lock (Program.Buren)
             {
-                Program.Recompute(poort);
+                lock (Program.recomputeLocker)
+                {
+                    Program.Recompute(poort);
+                }
             }
         }
 
         public override void D(string[] input, bool sendMessage)
         {
             int poort = int.Parse(input[1]);
+
             Connection verbinding;
             lock (Program.Buren)
             {
+
                 if (Program.Buren.TryGetValue(poort, out verbinding))
                 {
+
                     if (sendMessage)
                     {
+
                         verbinding.SendMessage("D " + Convert.ToString(Program.MijnPoort));
                     }
+                    Program.removeNdisuwv(poort);
                     Program.Buren.Remove(poort);
 
-                    lock (Program.Netwerk)
-                    {
-                        Program.Netwerk.Remove(poort);
+                    List<int> veranderd = new List<int>();
 
-                        foreach (int v in Program.Netwerk)
+                    lock (Program.Nbuv)
+                    {
+                        foreach (KeyValuePair<int, int?> tuple in Program.Nbuv)
                         {
-                            Program.Recompute(v);
+                            if (tuple.Value == poort) { veranderd.Add(tuple.Key); }
                         }
                     }
 
-                //    Program.removeNdisuwv(poort);
+                    lock (Program.recomputeLocker)
+                    {
+                        foreach (int bestemming in veranderd)
+                        {
 
-                //    List<int> veranderd = new List<int>();
-                //    Program.Buren.Remove(poort);
+                            Program.Recompute(bestemming);
 
-                //    lock (Program.Nbuv)
-                //    {
-                //        foreach (KeyValuePair<int, int?> entry in Program.Nbuv)
-                //        {
-                //            if (entry.Value == poort)    //deze buur is net gedelete
-                //            {
-                //                veranderd.Add(entry.Key); //hier ging hij heen
-                //            }
-                //        }
+                        }
+                    }
 
-                //        foreach (int pref in veranderd)
-                //        {
-                //            Program.Recompute(pref);
-                //        }
-                //    }
+                    //    Program.removeNdisuwv(poort);
+
+                    //    List<int> veranderd = new List<int>();
+                    //    Program.Buren.Remove(poort);
+
+                    //    lock (Program.Nbuv)
+                    //    {
+                    //        foreach (KeyValuePair<int, int?> entry in Program.Nbuv)
+                    //        {
+                    //            if (entry.Value == poort)    //deze buur is net gedelete
+                    //            {
+                    //                veranderd.Add(entry.Key); //hier ging hij heen
+                    //            }
+                    //        }
+
+                    //        foreach (int pref in veranderd)
+                    //        {
+                    //            Program.Recompute(pref);
+                    //        }
+                    //    }
 
 
-                //    Program.Recompute(poort);           //recompute!
+                    //    Program.Recompute(poort);           //recompute!
                 }
                 else
                 {
@@ -132,10 +159,10 @@ namespace MultiClientServer
                     }
                     else
                     {
-                        //if (dist != Program.N)
-                        //{
+                        if (dist != Program.N)
+                        {
                             Console.WriteLine(String.Format("{0} {1} {2}", port, dist, neigh));
-                        //}
+                        }
                     }
                 }
             }

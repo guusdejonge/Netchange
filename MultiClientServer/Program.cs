@@ -9,7 +9,6 @@ namespace MultiClientServer
     class Program
     {
         static public int MijnPoort;
-        static public List<int> Netwerk = new List<int>();
         static public Dictionary<int, Connection> Buren = new Dictionary<int, Connection>();                //lijst buren
         static public Dictionary<int, int> Duv = new Dictionary<int, int>();                                //schatting in u van distance u naar v
         static public Dictionary<int, int?> Nbuv = new Dictionary<int, int?>();                               //node u's preferred neighbor voor v
@@ -21,6 +20,7 @@ namespace MultiClientServer
 
         static public object NLocker = new object();
         static public object verwerktLocker = new object();
+        static public object recomputeLocker = new object();
 
         static public bool initKlaar = false;
 
@@ -31,7 +31,6 @@ namespace MultiClientServer
             Console.Title = args[0];
             aantalBuren = args.Length - 1;
             MijnPoort = int.Parse(args[0]);
-            addInNetwerk(MijnPoort);
             new Server(MijnPoort);
             try
             {
@@ -42,7 +41,6 @@ namespace MultiClientServer
                     if (poort > MijnPoort)
                     {
                         addBuren(poort, new Connection(poort));
-                        addInNetwerk(poort);
                         lock (verwerktLocker)
                         {
                             verwerkteBuren++;
@@ -70,7 +68,7 @@ namespace MultiClientServer
             ReadInput();
         }
 
-        static public void SendRoutingTable(Connection buur)
+        static public void SendRoutingTable(int poort, Connection buur)
         {
             lock (Duv)
             {
@@ -78,8 +76,12 @@ namespace MultiClientServer
                 {
                     string bericht = "mydist " + MijnPoort + " " + v + " " + Duv[v];
                     buur.SendMessage(bericht);
+                    //Console.WriteLine("Verstuurd ROUTINGTABLE" + " " + bericht + " naar " +  poort );
+
                 }
             }
+            buur.SendMessage("mydist " + MijnPoort + " " + MijnPoort + " " + 0);
+
         }
 
         static void init()
@@ -100,7 +102,6 @@ namespace MultiClientServer
                 {
                     addOrSetDuv(buur, N);
                     addOrSetNbuv(buur, null);
-                    addInNetwerk(buur);
                 }
                 foreach (int buur1 in Buren.Keys)
                 {
@@ -122,7 +123,7 @@ namespace MultiClientServer
             }
 
             initKlaar = true;
-            Console.WriteLine("Init klaar");
+            //Console.WriteLine("Init klaar");
         }
 
         static void updateburen(int v)    //stuur je nieuwe distance naar v naar alle buren NOTE: alleen gelockt anroepen
@@ -132,19 +133,21 @@ namespace MultiClientServer
             foreach (KeyValuePair<int, Connection> buur in Buren)
             {
                 buur.Value.SendMessage(bericht);
-                Console.WriteLine("Verstuurd " + " " + bericht + " naar" + " " + buur.Key);
+                //Console.WriteLine("Verstuurd " + " " + bericht + " naar" + " " + buur.Key);
 
             }
         }
 
         static public void Recompute(int v) //alleen als buren gelockt is
         {
-            Console.WriteLine(MijnPoort + " recompute " + v);
+            //Console.WriteLine(MijnPoort + " recompute " + v);
             if (v == MijnPoort)
             {
                 addOrSetDuv(MijnPoort, 0);
                 addOrSetNbuv(MijnPoort, MijnPoort);
             }
+
+            
             
             else
             {
@@ -160,8 +163,7 @@ namespace MultiClientServer
                 {
                     foreach (KeyValuePair<Tuple<int, int>, int> tuple in Ndisuwv)
                     {
-                        addInNetwerk(tuple.Key.Item1);
-                        addInNetwerk(tuple.Key.Item2);
+             
 
                         if (tuple.Key.Item2 == v)
                         {
@@ -277,24 +279,9 @@ namespace MultiClientServer
         }
 
 
-        static public void addInNetwerk(int poort)
-        {
-            lock (Netwerk)
-            {
-                if (!Netwerk.Contains(poort))
-                {
-                    Netwerk.Add(poort);
-                }
-            }
-        }
+        
 
-        static public void removeUitNetwerk(int poort)
-        {
-            lock (Netwerk)
-            {
-                Netwerk.Remove(poort);
-            }
-        }
+        
 
 
         static public void addBuren(int poort, Connection verbinding)
@@ -341,7 +328,7 @@ namespace MultiClientServer
                 if (Duv.ContainsKey(poort))
                 {
                     Duv[poort] = afstand;
-                    Console.WriteLine("Aangepast: " + poort + " " + afstand);
+                    //Console.WriteLine("Aangepast: " + poort + " " + afstand);
                 }
                 else
                 {

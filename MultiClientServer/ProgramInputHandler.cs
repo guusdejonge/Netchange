@@ -116,6 +116,8 @@ namespace MultiClientServer
                         }
                     }
 
+                    Program.Recompute(poort);
+
                     //    Program.removeNdisuwv(poort);
 
                     //    List<int> veranderd = new List<int>();

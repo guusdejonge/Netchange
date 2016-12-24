@@ -37,16 +37,15 @@ namespace MultiClientServer
                 for (int i = 0; i < aantalBuren; i++)
                 {
                     int poort = int.Parse(args[i + 1]);
-
                     if (poort > MijnPoort)
                     {
                         addBuren(poort, new Connection(poort));
-                        lock (verwerktLocker)
-                        {
-                            verwerkteBuren++;
-                        }
+                      //  lock (verwerktLocker)
+                      //  {
+                      //      verwerkteBuren++;
+                       // }
                     }
-                    else { }
+                    else {}
                 }
             }
 
@@ -89,10 +88,10 @@ namespace MultiClientServer
             addOrSetDuv(MijnPoort, 0);
             addOrSetNbuv(MijnPoort, MijnPoort);
 
-            while (verwerkteBuren != aantalBuren)
-            {
-                Thread.Sleep(100);
-            }
+            //while (verwerkteBuren != aantalBuren)
+           // {
+           //     Thread.Sleep(100);
+           // }
 
             lock (Buren)
             {

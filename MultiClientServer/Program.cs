@@ -40,10 +40,11 @@ namespace MultiClientServer
                     if (poort > MijnPoort)
                     {
                         addBuren(poort, new Connection(poort));
+                        Console.WriteLine("Verbonden: " + poort);
                       //  lock (verwerktLocker)
                       //  {
                       //      verwerkteBuren++;
-                       // }
+                      // }
                     }
                     else {}
                 }
@@ -112,7 +113,7 @@ namespace MultiClientServer
                         {
                             Tuple<int, int> tuple = new Tuple<int, int>(buur1, buur2);
                             addOrSetNdisuwv(tuple, N);
-
+         
                         }
                     }
 
@@ -180,6 +181,7 @@ namespace MultiClientServer
                 {
                     addOrSetDuv(v, N);
                     addOrSetNbuv(v, null);
+                    Console.WriteLine("Onbereikbaar: " + v);
                 }
 
                 if (afstand != afstandVoor)
@@ -237,6 +239,9 @@ namespace MultiClientServer
             //    updateburen(v);
             //    Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
             //}
+
+
+            Console.WriteLine("Afstand naar " + v + " is nu " + readDuv(v) + " via " + readNbuv(v));
         }
 
         static public void ReadInput()
@@ -283,18 +288,6 @@ namespace MultiClientServer
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex);
-                }
-            }
-        }
-
-        static public void removeBuren(int poort)
-        {
-            lock (Buren)
-            {
-                Buren.Remove(poort);
-                foreach (int buur in Buren.Keys)
-                {
-                    Console.WriteLine(buur);
                 }
             }
         }

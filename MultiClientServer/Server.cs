@@ -38,6 +38,9 @@ namespace MultiClientServer
                     Connection verbinding = new Connection(clientIn, clientOut);
 
                     Program.addBuren(zijnPoort, verbinding);
+
+                    Console.WriteLine("Verbonden: " + zijnPoort);
+
                     lock (Program.verwerktLocker)
                     {
                         Program.verwerkteBuren++;
@@ -57,7 +60,6 @@ namespace MultiClientServer
                     Program.addOrSetDuv(zijnPoort, 1);
                     Program.addOrSetNbuv(zijnPoort, zijnPoort);
                     Program.updateburen(zijnPoort);
-                    Console.WriteLine(zijnPoort + " is nu mijn buur");
 
                     lock (Program.Buren)
                     {

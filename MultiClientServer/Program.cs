@@ -55,12 +55,12 @@ namespace MultiClientServer
             inputHandler = new ProgramInputHandler();
 
             init();
-            foreach (Connection verbinding in Buren.Values)
-            {
-                string bericht = "mydist " + MijnPoort + " " + MijnPoort + " " + readDuv(MijnPoort);    //dus: "mydist mijnpoort anderepoort afstand"
-                verbinding.SendMessage(bericht);
+            //foreach (Connection verbinding in Buren.Values)
+            //{
+            //    string bericht = "mydist " + MijnPoort + " " + MijnPoort + " " + readDuv(MijnPoort);    //dus: "mydist mijnpoort anderepoort afstand"
+            //    verbinding.SendMessage(bericht);
 
-            }
+            //}
 
             updateburen(MijnPoort);
 
@@ -88,7 +88,7 @@ namespace MultiClientServer
             addOrSetDuv(MijnPoort, 0);
             addOrSetNbuv(MijnPoort, MijnPoort);
 
-            //while (verwerkteBuren != aantalBuren)
+           //while (verwerkteBuren != aantalBuren)
            // {
            //     Thread.Sleep(100);
            // }

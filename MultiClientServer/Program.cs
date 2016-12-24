@@ -32,6 +32,8 @@ namespace MultiClientServer
             aantalBuren = args.Length - 1;
             MijnPoort = int.Parse(args[0]);
             new Server(MijnPoort);
+
+            //Buren toevoegen die zijn ingegeven opstarten
             try
             {
                 for (int i = 0; i < aantalBuren; i++)
@@ -50,6 +52,7 @@ namespace MultiClientServer
                 }
             }
 
+            //Als buur nog niet is opgestart en Connection faalt, even slapen...
             catch { Thread.Sleep(50); }
 
 
@@ -86,6 +89,7 @@ namespace MultiClientServer
 
         static void init()
         {
+            //Gegevens voor eigen proces instellen
             addOrSetDuv(MijnPoort, 0);
             addOrSetNbuv(MijnPoort, MijnPoort);
 
@@ -96,13 +100,17 @@ namespace MultiClientServer
 
             lock (Buren)
             {
+                //Aan buren doorgeven dat mijn afstand naar mezelf 0 is
                 updateburen(MijnPoort);
 
+                //Elke buur aan Duv en Nbuv toevoegen met maximale afstand of preferred neighbour
                 foreach (int buur in Buren.Keys)
                 {
                     addOrSetDuv(buur, N);
                     addOrSetNbuv(buur, null);
                 }
+
+                //Alle combinaties van buren in ndisuwv zetten met maximale afstand 
                 foreach (int buur1 in Buren.Keys)
                 {
 
@@ -126,9 +134,11 @@ namespace MultiClientServer
             //Console.WriteLine("Init klaar");
         }
 
-        static public void updateburen(int v)    //stuur je nieuwe distance naar v naar alle buren NOTE: alleen gelockt anroepen
+        //Stuur mijn nieuwe distance voor v naar alle buren 
+        //NOTE: alleen met Buren gelockt anroepen
+        static public void updateburen(int v)   
         {
-            string bericht = "mydist " + MijnPoort + " " + v + " " + readDuv(v);    //dus: "mydist mijnpoort anderepoort afstand"
+            string bericht = "mydist " + MijnPoort + " " + v + " " + readDuv(v);    
 
             foreach (KeyValuePair<int, Connection> buur in Buren)
             {
@@ -140,7 +150,7 @@ namespace MultiClientServer
 
         static public void Recompute(int v) //alleen als buren gelockt is
         {
-            //Console.WriteLine(MijnPoort + " recompute " + v);
+            //Als ik v ben dan afstand op 0 en mezelf als preferred neighbor
             if (v == MijnPoort)
             {
                 addOrSetDuv(MijnPoort, 0);
@@ -151,21 +161,28 @@ namespace MultiClientServer
             
             else
             {
+                //Afstand en preferred neigbour initialiseren als N en null
                 int afstand = N;
+                int? prefBuurVoor = null;
+
+                //Als v al bekend is wordt afstandVoor de oude afstand
                 int afstandVoor = 21;
                 if (Duv.ContainsKey(v))
                 {
                     afstandVoor = readDuv(v);
                 }
-                int? prefBuurVoor = null;
+                
                 lock (Ndisuwv)
                 {
                     foreach (KeyValuePair<Tuple<int, int>, int> tuple in Ndisuwv)
                     {
+                        //Als een buur een afstand voor v, of Item2, weet
                         if (tuple.Key.Item2 == v)
                         {
+                            //Als de afstand kleiner is dan de vorige kleinste afstand
                             if (tuple.Value < afstand)
                             {
+                                //Mijn afstand is deze afstand + 1
                                 afstand = 1 + tuple.Value;
                                 prefBuurVoor = tuple.Key.Item1;
                             }

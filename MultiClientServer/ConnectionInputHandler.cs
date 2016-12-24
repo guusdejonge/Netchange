@@ -11,10 +11,12 @@ namespace MultiClientServer
 
         public override void B(string[] input)
         {
+            //Als het bericht voor mij is
             if (int.Parse(input[1]) == Program.MijnPoort)
             {
                 Console.WriteLine(input[2]);
             }
+            //Anders doorsturen naar preferred neighbour
             else
             {
                 Console.WriteLine("Bericht voor " + input[1] + " doorgestuurd naar " + Program.readNbuv(int.Parse(input[1])));
@@ -24,6 +26,7 @@ namespace MultiClientServer
 
         public override void D(string[] input, bool sendMessage)
         {
+            //Delete doen zonder bericht te sturen naar andere poort
             programInputHandler.D(input, false);
 
         }
